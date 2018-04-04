@@ -1,0 +1,55 @@
+.Container .logo-wrapper {
+    float: left;
+}
+.Container .logo-wrapper .logo {
+  width: 120px;
+  height: 31px;
+  margin: 16px 24px 16px 0;
+}
+.media-left {
+    float: left;
+    color: #e7e7e7;
+    margin-right: 24px;
+}
+.media-right {
+    float: right;
+}
+.media-right a {
+    color: #e7e7e7;
+}
+ul.media-right li {
+    list-style: none;
+    display: inline-block;
+    margin: 0 12px;
+}
+.login-form-forgot {
+  float: right;
+}
+.login-form-button {
+  width: 100%;
+}
+.content-label::before {
+    display: inline-block;
+    margin-right: 4px;
+    content: "*";
+    font-family: SimSun;
+    line-height: 1;
+    font-size: 14px;
+    color: #f5222d;
+}
+.editor-tool-bar {
+    background: transparent;
+	border: 1px solid #ddd;
+	border-radius: 4px 4px 0 0;
+    padding: 0;
+    margin: 0;
+}
+.editor-tool-bar .tool-item {
+    position: relative;
+	list-style: none;
+    display: inline-block;
+    font-size: 20px;
+}
+.editor-tool-bar .tool-item:first-child {
+    margin: 0 12px 0 29px;
+}
