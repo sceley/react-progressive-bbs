@@ -5,7 +5,7 @@ exports.checkUsername = async (req, res) => {
     try {
         let body = req.body;
         let users = await new Promise((resolve, reject) => {
-            let sql = 'select Username from User where Username=?';
+            let sql = 'select username from User where username=?';
             db.query(sql, [body.Username], (err, users) => {
                 if (err) {
                     reject(err);
@@ -37,16 +37,16 @@ exports.checkUsername = async (req, res) => {
 exports.checkCaptcha = async (req, res) => {
     try {
         let body = req.body;
-        let Captcha = await new Promise((resolve, reject) => {
-            redis.get(body.Email, (err, Captcha) => {
+        let captcha = await new Promise((resolve, reject) => {
+            redis.get(body.email, (err, captcha) => {
                 if (err) {
                     reject(err);
                 } else {
-                    resolve(Captcha);
+                    resolve(captcha);
                 }
             });
         });
-        if (body.Captcha === Captcha) {
+        if (body.captcha === captcha) {
             res.json({
                 err: 0,
                 msg: '验证码正确'
@@ -70,8 +70,8 @@ exports.checkEmail = async (req, res) => {
     try {
         let body = req.body;
         let users = await new Promise((resolve, reject) => {
-            let sql = 'select * from User where Email=?';
-            db.query(sql, [body.Email], (err, users) => {
+            let sql = 'select * from User where email=?';
+            db.query(sql, [body.email], (err, users) => {
                 if (err) {
                     reject(err);
                 } else {

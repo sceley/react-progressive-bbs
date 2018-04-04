@@ -11,7 +11,7 @@ class LoginForm extends Component {
                     <FormItem
                         label="账号"
                     >
-                        {getFieldDecorator('userName', {
+                        {getFieldDecorator('username', {
                             rules: [{ required: true, message: 'Please input your username!' }],
                         })(
                             <Input prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="用户名/邮箱" />

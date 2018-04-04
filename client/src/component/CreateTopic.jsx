@@ -8,7 +8,7 @@ class CreateTopicForm extends Component {
         e.preventDefault();
         this.props.form.validateFields((err, values) => {
             if (!err) {
-                let body = this.editor.getValue();
+                let body = this.refs.editor.getValue();
                 values.body = body;
                 console.log('Received values of form: ', values);
             }
@@ -22,7 +22,7 @@ class CreateTopicForm extends Component {
                     <FormItem
                         label="板块"
                     >
-                        {getFieldDecorator('Tab', {
+                        {getFieldDecorator('tab', {
                             rules: [{
                                 required: true, message: 'Please input your password!',
                             }],
@@ -36,7 +36,7 @@ class CreateTopicForm extends Component {
                     <FormItem
                         label="标题"
                     >
-                        {getFieldDecorator('Title', {
+                        {getFieldDecorator('title', {
                             rules: [{
                                 required: true, message: 'Please input your E-mail!',
                             }],

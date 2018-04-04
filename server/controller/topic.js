@@ -24,7 +24,7 @@ exports.createTopic = async (req, res) => {
         });
         await new Promise((resolve, reject) => {
             let sql = "insert into Topic(tab, title, body, author, createAt) values(?, ?, ?, ?, ?)";
-            db.query(sql, [body.Tab, body.Title, body.Body, author, createAt], (err) => {
+            db.query(sql, [body.tab, body.title, body.body, author, createAt], (err) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -154,8 +154,8 @@ exports.comment = async (req, res) => {
             })
         });
         await new Promise((resolve, reject) => {
-            let sql = "insert into Comment(author, body, tid, mentioner, createAt) values(?, ?, ?, ?, ?)";
-            db.query(sql, [author, body.Body, id, body.Mentioner, createAt], (err) => {
+            let sql = "insert into Comment(author, body, tid, createAt) values(?, ?, ?, ?, ?)";
+            db.query(sql, [author, body.body, id, createAt], (err) => {
                 if (err) {
                     reject(err);
                 } else {

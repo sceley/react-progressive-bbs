@@ -15,33 +15,33 @@ exports.logup = async (req, res) => {
             });
         }
         let pattern = /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
-        if ((!body.Username) || (body.Username && (body.Username.length > 10 || body.Username.length < 2))) {
+        if ((!body.username) || (body.username && (body.username.length > 10 || body.username.length < 2))) {
             return res.json({
                 err: 1,
                 msg: '用户名必须为2-10位字符'
             });
         }
-        if ((!body.Password) || (body.Password && (body.Password.length > 16 || body.Password.length < 6))) {
+        if ((!body.password) || (body.password && (body.password.length > 16 || body.password.length < 6))) {
             return res.json({
                 err: 1,
                 msg: '密码必须为6-16位字符'
             });
         }
-        if ((!body.Email) || (body.Email && !pattern.test(body.Email))) {
+        if ((!body.email) || (body.email && !pattern.test(body.email))) {
             res.json({
                 err: 1,
                 msg: '邮箱格式不正确'
             });
         }
-        if ((!body.Captcha) || (body.Captcha && body.Captcha.length !== 6)) {
+        if ((!body.captcha) || (body.captcha && body.captcha.length !== 6)) {
             return res.json({
                 err: 1,
                 msg: '验证码必须为6位'
             });
         }
         let names_count = await new Promise((resolve, reject) => {
-            let sql = 'select count(id) as count from User where Username=?';
-            db.query(sql, [body.Username], (err, users) => {
+            let sql = 'select count(id) as count from User where username=?';
+            db.query(sql, [body.username], (err, users) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -58,8 +58,8 @@ exports.logup = async (req, res) => {
         }
 
         let emails_count = await new Promise((resolve, reject) => {
-            let sql = 'select count(id) as count from User where Email=?';
-            db.query(sql, [body.Email], (err, users) => {
+            let sql = 'select count(id) as count from User where email=?';
+            db.query(sql, [body.email], (err, users) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -73,23 +73,23 @@ exports.logup = async (req, res) => {
                 msg: '该邮箱已经被注册'
             });
         }
-        let Captcha = await new Promise((resolve, reject) => {
-            redis.get(body.Email, (err, Captcha) => {
+        let captcha = await new Promise((resolve, reject) => {
+            redis.get(body.email, (err, captcha) => {
                 if (err) {
                     reject(err);
                 } else {
-                    resolve(Captcha);
+                    resolve(captcha);
                 }
             });
         });
-        if (body.Captcha !== Captcha) {
+        if (body.captcha !== captcha) {
             return res.json({
                 err: 1,
                 msg: '验证码错误'
             });
         }
         let hash = await new Promise((resolve, reject) => {
-            bcrypt.hash(body.Password, saltRounds, function (err, hash) {
+            bcrypt.hash(body.password, saltRounds, function (err, hash) {
                 if (err) {
                     reject(err);
                 } else {
@@ -97,10 +97,10 @@ exports.logup = async (req, res) => {
                 }
             });
         });
-        body.Password = hash;
+        body.password = hash;
         await new Promise((resolve, reject) => {
-            let sql = 'insert into User (Username, Password, Email) values (?, ?, ?)';
-            db.query(sql, [body.Username, body.Password, body.Email], (err) => {
+            let sql = 'insert into User (username, password, email) values (?, ?, ?)';
+            db.query(sql, [body.username, body.password, body.email], (err) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -129,21 +129,21 @@ exports.login = async (req, res) => {
                 msg: '不是json的上传数据'
             });
         }
-        if (!body.Account) {
+        if (!body.account) {
             return res.json({
                 err: 1,
                 msg: '帐号不能为空'
             });
         }
-        if ((!body.Password) || (body.Password && (body.Password.length > 16 || body.Password.length < 6))) {
+        if ((!body.password) || (body.password && (body.password.length > 16 || body.password.length < 6))) {
             return res.json({
                 err: 1,
                 msg: '密码长度必须为6-16个字符'
             });
         }
         let user = await new Promise((resolve, reject) => {
-            let sql = 'select password, id from User where Username=? or Email=?';
-            db.query(sql, [body.Account, body.Account], (err, users) => {
+            let sql = 'select password, id from User where username=? or email=?';
+            db.query(sql, [body.account, body.account], (err, users) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -158,7 +158,7 @@ exports.login = async (req, res) => {
             });
         }
         let corrected = await new Promise((resolve, reject) => {
-            bcrypt.compare(body.Password, user.password, function (err, corrected) {
+            bcrypt.compare(body.password, user.password, function (err, corrected) {
                 if (err) {
                     reject(err);
                 } else {

@@ -6,9 +6,16 @@ exports.getCaptcha = async (req, res) => {
     try {
         let body = req.body;
         let captcha = String(Math.random()).slice(-6);
-        await sendCaptcha(body.Email, captcha);
+        let pattern = /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
+        if ((!body.email) || (body.email && !pattern.test(body.email))) {
+            res.json({
+                err: 1,
+                msg: '邮箱格式不正确'
+            });
+        }
+        await sendCaptcha(body.email, captcha);
         await new Promise((resolve, reject) => {
-            redis.set(body.Email, captcha, 'EX', 60 * 10, (err) => {
+            redis.set(body.email, captcha, 'EX', 60 * 10, (err) => {
                 if (err) {
                     reject(err);
                 } else {

@@ -15,10 +15,10 @@ const html = (body) =>
     </body>
     </html>
     `;
-exports.sendCaptcha = async (Email, captcha) => {
+exports.sendCaptcha = async (email, captcha) => {
     let mailOptions = {
         from: 'Sceley的个人论坛<sceley520@126.com>', // sender address
-        to: Email, // list of receivers
+        to: email, // list of receivers
         subject: 'Sceley的个人论坛验证码', // Subject line
         html: html(`感谢您能踏足我的个人论坛，验证码为：<a>${captcha}</a>，I hope you have a good time，在我的论坛里畅所欲言，希望你能喜欢我的个人论坛，如果你对我这个论坛有更好的建议，欢迎致信：1538306377@qq.com，我将不胜感激。`) // html body
     };
