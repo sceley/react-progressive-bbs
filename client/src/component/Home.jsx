@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Tabs } from 'antd';
-import Tab from './Tab';
+import Tab from '../common/Tab';
 const { TabPane } = Tabs;
 export default class Container extends Component {
     render() {
