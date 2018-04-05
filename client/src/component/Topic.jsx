@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
 import { Layout, List, Avatar, Card, Button, message, Icon } from 'antd';
 import moment from 'moment';
 import Editor from '../common/Editor';
@@ -63,7 +64,7 @@ export default class Topic extends Component {
         user: '',
         collected: ''
     }
-    componentWillMount = () => {
+    componentDidMount = () => {
         let id = this.props.match.params.id
         fetch(`${config.server}/api/topic/${id}`, {
             method: 'GET',
@@ -81,9 +82,12 @@ export default class Topic extends Component {
                     collected: json.collected
                 });
                 this.pullUserInfo(json.topic.uid);
+            } else {
+                message.error(json.msg);
             }
         });
     }
+    componentWillReceiveProps = this.componentDidMount;
     pullUserInfo = (id) => {
         fetch(`${config.server}/api/user/${id}/info`)
         .then(res => {
@@ -94,6 +98,8 @@ export default class Topic extends Component {
                 this.setState({
                     user: json.user
                 });
+            } else {
+                message.error(json.msg);
             }
         });
     }
@@ -115,7 +121,13 @@ export default class Topic extends Component {
                 return res.json();
         }).then(json => {
             if (json && !json.err) {
-                message.info(json.msg);
+                value.createAt = moment().format('YYYY-MM-DD HH:SS');
+                this.setState({
+                    comments: [...this.state.comments, value]
+                });
+                this.refs.editor.setValue('');
+            } else {
+                message.error(json.msg);
             }
         });
     }
@@ -132,10 +144,16 @@ export default class Topic extends Component {
         }).then(json => {
             if (json && !json.err) {
                 message.info(json.msg);
+                this.setState({
+                    collected: !this.state.collected
+                });
             } else {
                 message.error(json.msg);
             }
         });
+    }
+    handleEnter = (author) => {
+        this.refs.editor.setValue(`@${author} `);
     }
     render() {
         return (
@@ -159,10 +177,17 @@ export default class Topic extends Component {
                                 bordered={true}
                                 renderItem={item => (
                                     <List.Item
-                                        actions={[<span>{moment(item.CreateAt).format("YYYY-MM-DD HH:MM")}</span>]}
+                                        actions={[
+                                            <span>{moment(item.CreateAt).format("YYYY-MM-DD HH:MM")}</span>,
+                                            <a onClick={() => this.handleEnter(item.author)}><Icon type="enter" /></a>
+                                        ]}
                                     >
                                         <List.Item.Meta
-                                            avatar={<Avatar src={item.avatar} />}
+                                            avatar={
+                                                <Link to={`/user/${item.uid}`}>
+                                                    <Avatar src={item.avatar} />
+                                                </Link>
+                                            }
                                             description={<div dangerouslySetInnerHTML={{
                                                 __html: md.render(item.body || '')
                                             }} />}
@@ -176,7 +201,6 @@ export default class Topic extends Component {
                             <div style={{ marginTop: 24, textAlign: 'center' }}>
                                 <Button onClick={this.handleSubmit} type="primary">回复</Button>
                             </div>
-                            
                         </div>
                     </Content>
                     <Sider width={250} style={{ background: '#f0f2f5' }}>

@@ -358,10 +358,23 @@ exports.user = async (req, res) => {
                 }
             });
         });
+        let collect_topics = await new Promise((resolve, reject) => {
+            let sql = `select Topic.id, tab, author, title, body, Topic.createAt, User.id as uid 
+            from Collect left join Topic on Topic.id=Collect.tid
+            left join User on User.id=Collect.uid where Collect.uid=?`;
+            db.query(sql, [id], (err, topics) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(topics);
+                }
+            });
+        });
         res.json({
             err: 0,
             user: user,
-            topics: topics
+            topics: topics,
+            collect_topics: collect_topics
         });
     } catch (e) {
         logger.error(`user_handle->${e}`);

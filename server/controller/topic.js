@@ -134,7 +134,7 @@ exports.getTopic = async (req, res) => {
         });
         let comments = await new Promise((resolve, reject) => {
             let sql = `select likeCount, avatar, body, author, mentioner,
-                        Comment.createAt, Comment.id, CLike.id as lid from Comment 
+                        Comment.createAt, Comment.id, CLike.id as lid, User.id as uid from Comment 
                         left join CLike 
 						on CLike.cid=Comment.id and CLike.tid=Comment.tid and CLike.uid=?
                         left join User 

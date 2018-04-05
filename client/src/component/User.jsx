@@ -24,7 +24,7 @@ export default class User extends Component {
     state = {
         user: '',
         topics: [],
-        comments: []
+        collect_topics: []
     }
     componentWillMount = () => {
         let id = this.props.match.params.id;
@@ -37,7 +37,7 @@ export default class User extends Component {
                     this.setState({
                         user: json.user,
                         topics: json.topics,
-                        comments: json.comments
+                        collect_topics: json.collect_topics
                     });
                 }
             });
@@ -77,17 +77,20 @@ export default class User extends Component {
                         >
                             <List
                                 itemLayout="horizontal"
-                                dataSource={this.state.comments}
+                                dataSource={this.state.collect_topics}
                                 bordered={true}
                                 renderItem={item => (
-                                    <List.Item
-                                        actions={[<span>{moment(item.CreateAt).format("YYYY-MM-DD HH:MM")}</span>]}
-                                    >
+                                    <List.Item actions={[<span>{moment(item.CreateAt).format("YYYY-MM-DD HH:MM")}</span>]}>
                                         <List.Item.Meta
                                             avatar={<Avatar src={item.avatar} />}
-                                            description={<div dangerouslySetInnerHTML={{
-                                                __html: md.render(item.body || '')
-                                            }} />}
+                                            title={
+                                                <Link to={`/topic/${item.id}`}>
+                                                    <Tag color="#87d068">
+                                                        {item.tab == 'tech' ? "技术" : "生活"}
+                                                    </Tag>
+                                                    {item.title}
+                                                </Link>
+                                            }
                                         />
                                     </List.Item>
                                 )}

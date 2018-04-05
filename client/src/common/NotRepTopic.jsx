@@ -31,7 +31,7 @@ export default class NotRepTopic extends Component {
                         dataSource={this.state.topics}
                         renderItem={item => (
                             <List.Item>
-                                <Link style={{ color: 'rgba(0, 0, 0, 0.65)' }} to={`topic/${item.id}`}>{item.title}</Link>
+                                <Link to={`/topic/${item.id}`}>{item.title}</Link>
                             </List.Item>
                         )}
                     />
@@ -40,3 +40,4 @@ export default class NotRepTopic extends Component {
         );
     }
 }
+//  style={{ color: 'rgba(0, 0, 0, 0.65)' }}
