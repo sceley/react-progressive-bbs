@@ -4,6 +4,7 @@ import { Button, Icon, Modal, Upload, Card } from 'antd';
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/mode/markdown/markdown.js';
 import 'codemirror/theme/shadowfox.css';
+import config from '../config';
 export default class Editor extends Component {
     state = {
         visible: false
@@ -23,6 +24,29 @@ export default class Editor extends Component {
     handleCancel = () => {
         this.setState({
             visible: false
+        });
+    }
+    handleUpload = (e) => {
+        let body = new FormData();
+        body.append('image', e.file);
+        fetch(`${config.server}/api/upload/image`, {
+            method: 'POST',
+            headers: {
+                'x-access-token': localStorage.token
+            },
+            body: body
+        }).then(res => {
+            if (res.ok) {
+                return res.json();
+            }
+        }).then(json => {
+            if (json && !json.err) {
+                this.setState({
+                    visible: false
+                });
+                let data = this.getValue() + `![${e.file.name}](${json.url})`;
+                this.setValue(data);
+            }
         });
     }
     getValue = () => this.editor.getValue();

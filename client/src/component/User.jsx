@@ -72,7 +72,7 @@ export default class User extends Component {
                             />
                         </Card>
                         <Card
-                            title="他发表的评论"
+                            title="他收藏的话题"
                             style={{marginTop: 24}}
                         >
                             <List

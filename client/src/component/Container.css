@@ -79,3 +79,13 @@ ul.media-right li {
     list-style: none;
     margin-bottom: 12px;
 }
+.statement {
+    padding: 0;
+    margin: 0;
+}
+.statement li {
+    list-style-type: none;
+}
+img {
+    max-width: 100%;
+}

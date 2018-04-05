@@ -55,7 +55,7 @@ class SettingForm extends Component {
     render() {
         const { getFieldDecorator } = this.props.form;
         return (
-            <Form onSubmit={this.handleSubmit} className="SettingForm">
+            <Form style={{ maxWidth: 500, margin: '0 auto' }} onSubmit={this.handleSubmit} className="SettingForm">
                 <FormItem
                     label="用户名"
                 >
@@ -139,9 +139,12 @@ class SettingForm extends Component {
                     )}
                 </FormItem>
                 <FormItem>
-                    <Button type="primary" htmlType="submit">
-                        更改
-                    </Button>
+                    <div style={{textAlign: 'center'}}>
+                        <Button type="primary" htmlType="submit">
+                            更改
+                        </Button>
+                    </div>
+                    
                 </FormItem>
             </Form>
         );
@@ -176,7 +179,7 @@ export default class Setting extends Component {
                 <Layout>
                     <Content style={{ background: '#fff', padding: 24, marginRight: 24, minHeight: 280 }}>
                         <Card
-                            title={<div><Icon style={{marginRight: 5}} type="setting" />信息编辑</div>}
+                            title={<h2><Icon style={{marginRight: 5}} type="setting" />信息编辑</h2>}
                         >
                             <WrapperSettingForm/>
                         </Card>

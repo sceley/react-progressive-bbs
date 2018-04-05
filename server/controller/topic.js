@@ -200,3 +200,57 @@ exports.comment = async (req, res) => {
         });
     }
 };
+exports.collect = async (req, res) => {
+    try {
+        let id = req.params.id;
+        let uid = req.session.uid;
+        let collected = await new Promise((resolve, reject) => {
+            let sql = "select id from Collect where uid=? and tid=?";
+            db.query(sql, [uid, id], (err, collects) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(collects.length);
+                }
+            });
+        });
+        if (collected) {
+            await new Promise((resolve, reject) => {
+                let sql = "delete from Collect where uid=? and tid=?";
+                db.query(sql, [uid, id], (err) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve();
+                    }
+                });
+            });
+            res.json({
+                err: 0,
+                msg: '取消收藏'
+            });
+        } else {
+            await new Promise((resolve, reject) => {
+                let createAt = moment().format("YYYY-MM-DD HH:MM");
+                let sql = "insert into Collect(uid, tid, createAt) values(?, ?, ?)";
+                db.query(sql, [uid, id, createAt], (err) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve();
+                    }
+                });
+            });
+            res.json({
+                err: 0,
+                msg: '收藏'
+            });
+        }
+    } catch (e) {
+        logger.error(`collect_handle->${e}`);
+        res.json({
+            err: 1,
+            msg: '服务器出错了'
+        });
+    }
+}

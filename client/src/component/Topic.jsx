@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Layout, List, Avatar, Card, Button, message } from 'antd';
+import { Layout, List, Avatar, Card, Button, message, Icon } from 'antd';
 import moment from 'moment';
 import Editor from '../common/Editor';
 import config from '../config';
@@ -23,7 +23,15 @@ const md = new Markdown({
 });
 const Title = (props) => (
     <div className="topic-title">
-        <h2>{props.topic.title}</h2>
+        <h2>
+            {props.topic.title}
+            <a onClick={props.handleCollect}>
+                {
+                    props.collected ? <Icon style={{ float: 'right' }} type="heart" />:<Icon style={{float: 'right'}} type="heart-o" />
+                }
+                
+            </a>
+        </h2>
         <ul className="item-list">
             <li>
                 <em>
@@ -52,19 +60,25 @@ export default class Topic extends Component {
     state = {
         topic: '',
         comments: [],
-        user: ''
+        user: '',
+        collected: ''
     }
     componentWillMount = () => {
         let id = this.props.match.params.id
-        fetch(`${config.server}/api/topic/${id}`)
-        .then(res => {
+        fetch(`${config.server}/api/topic/${id}`, {
+            method: 'GET',
+            headers: {
+                'x-access-token': localStorage.token
+            }
+        }).then(res => {
             if (res.ok)
                 return res.json();
         }).then(json => {
             if (json && !json.err) {
                 this.setState({
                     topic: json.topic,
-                    comments: json.comments
+                    comments: json.comments,
+                    collected: json.collected
                 });
                 this.pullUserInfo(json.topic.uid);
             }
@@ -105,13 +119,31 @@ export default class Topic extends Component {
             }
         });
     }
+    handleCollect = () => {
+        let id = this.props.match.params.id;
+        fetch(`${config.server}/api/topic/${id}/collect`, {
+            method: 'GET',
+            headers: {
+                'x-access-token': localStorage.token
+            }
+        }).then(res => {
+            if (res.ok)
+                return res.json();
+        }).then(json => {
+            if (json && !json.err) {
+                message.info(json.msg);
+            } else {
+                message.error(json.msg);
+            }
+        });
+    }
     render() {
         return (
             <div className="Tab">
                 <Layout>
                     <Content style={{ background: '#fff', padding: 24, marginRight: 24, minHeight: 280 }}>
                         <Card
-                            title={<Title topic={this.state.topic} />}
+                            title={<Title handleCollect={this.handleCollect} topic={this.state.topic} collected={this.state.collected} />}
                         >
                             <div dangerouslySetInnerHTML={{
                                 __html: md.render(this.state.topic.body || '')
@@ -141,7 +173,10 @@ export default class Topic extends Component {
                         </Card>
                         <div style={{ marginTop: 24 }}>
                             <Editor ref="editor" />
-                            <Button onClick={this.handleSubmit} style={{ marginTop: 24 }} type="primary">回复</Button>
+                            <div style={{ marginTop: 24, textAlign: 'center' }}>
+                                <Button onClick={this.handleSubmit} type="primary">回复</Button>
+                            </div>
+                            
                         </div>
                     </Content>
                     <Sider width={250} style={{ background: '#f0f2f5' }}>

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import { Form, Input, Button, Icon, message } from 'antd';
+import { Card, Form, Input, Button, Icon, message } from 'antd';
 import config from '../config';
 const FormItem = Form.Item;
 class LoginForm extends Component {
@@ -39,7 +39,10 @@ class LoginForm extends Component {
         const { getFieldDecorator } = this.props.form;
         return (
             <div className="LoginForm">
-                <Form onSubmit={this.handleSubmit} className="login-form">
+                <Card
+                    title={<h2>登陆</h2>}
+                >
+                <Form style={{maxWidth: 500, margin: '0 auto'}} onSubmit={this.handleSubmit} className="login-form">
                     <FormItem
                         label="账号"
                     >
@@ -66,20 +69,23 @@ class LoginForm extends Component {
                     </FormItem>
                     <FormItem>
                         <div>
-                            <Link to="/forgotpassword" className="login-form-forgot">忘记密码</Link>
+                                <Link to="/forgotpassword" className="login-form-forgot">忘记密码</Link>
                         </div>
-                        <div>
+                        <div style={{textAlign: 'center'}}>
                             <Button type="primary" htmlType="submit">
                                 登陆
                             </Button>
                         </div>
-                        <div>
+                        <div style={{fontSize: 16}}>
                             其他登陆：
                             <a href={`${config.server}/api/auth/github`}><Icon type="github" /></a>
                         </div>
-                        <Link to="/logup">现在注册!</Link>
+                        <div>
+                            <Link to="/logup">现在注册!</Link>
+                        </div>     
                     </FormItem>
                 </Form>
+                </Card>
             </div>
         );
     }

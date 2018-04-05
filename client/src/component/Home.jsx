@@ -46,16 +46,21 @@ export default class Container extends Component {
                         </Tabs>
                     </Content>
                     <Sider width={250} style={{ background: '#f0f2f5' }}>
-                        <Profile user={this.state.user}/>
-                        
-                        <Card
-                            style={{ marginTop: '24px' }}
-                        >
-                            <Link to="/topic/create">
-                                <Button type="primary" style={{ width: '100%' }}>发表话题</Button>
-                            </Link>
-                        </Card>
-                        <NotRepTopic style={{marginTop: 24}}/>
+                        {
+                            localStorage.token?
+                            <div>
+                                <Profile user={this.state.user} />
+                                <Card
+                                    style={{ margin: '24px 0' }}
+                                >
+                                    <Link to="/topic/create">
+                                        <Button type="primary" style={{ width: '100%' }}>发表话题</Button>
+                                    </Link>
+                                </Card>
+                            </div>
+                            :null
+                        }
+                        <NotRepTopic/>
                     </Sider>
                 </Layout>
             </div>

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import { Form, Input, Button, Icon, Row, Col } from 'antd';
+import { Card, Form, Input, Button, Icon, Row, Col } from 'antd';
 import config from '../config';
 const FormItem = Form.Item;
 class LogupForm extends Component {
@@ -67,7 +67,10 @@ class LogupForm extends Component {
         const { getFieldDecorator } = this.props.form;
         return (
             <div className="LogupForm">
-                <Form onSubmit={this.handleSubmit} className="login-form">
+                <Card
+                    title={<h2>忘记密码</h2>}
+                >
+                <Form style={{maxWidth: 500, margin: '0 auto'}} onSubmit={this.handleSubmit} className="login-form">
                     <FormItem
                         label="用户名"
                     >
@@ -120,14 +123,15 @@ class LogupForm extends Component {
                         )}
                     </FormItem>
                     <FormItem>
-                        <div>
-                            <Button type="primary" htmlType="submit" className="login-form-button">
+                        <div style={{textAlign: 'center'}}>
+                            <Button type="primary" htmlType="submit">
                                 找回密码
                             </Button>
                         </div>
                         <Link to="/login">登陆!</Link>
                     </FormItem>
                 </Form>
+                </Card>
             </div>
         );
     }
