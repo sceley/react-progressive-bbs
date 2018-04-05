@@ -28,18 +28,34 @@ export default class Container extends Component {
                             enterButton
                             style={{ width: 250 }}
                         />
-                        <ul className="media-right">
-                            <li>
-                                <Link to="/login">
-                                    登陆
-                                </Link>
-                            </li>
-                           <li>
-                               <Link to="/logup">
-                                    注册
-                                </Link>
-                           </li>
-                        </ul>
+                        {
+                            localStorage.token?
+                            <ul className="media-right">
+                                <li>
+                                    <Link to="/login">
+                                        设置
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link to="/logup">
+                                        退出
+                                    </Link>
+                                </li>
+                            </ul>
+                            :
+                            <ul className="media-right">
+                                <li>
+                                    <Link to="/login">
+                                        登陆
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link to="/logup">
+                                        注册
+                                    </Link>
+                                </li>
+                            </ul>
+                        }
                     </Header>
                     <Content style={{ marginTop: '24px', padding: '0 50px' }}>
                         <Layout>

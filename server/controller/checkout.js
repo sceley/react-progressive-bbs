@@ -5,8 +5,8 @@ exports.checkUsername = async (req, res) => {
     try {
         let body = req.body;
         let users = await new Promise((resolve, reject) => {
-            let sql = 'select username from User where username=?';
-            db.query(sql, [body.Username], (err, users) => {
+            let sql = 'select id from User where username=?';
+            db.query(sql, [body.username], (err, users) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -17,12 +17,12 @@ exports.checkUsername = async (req, res) => {
         if (users.length > 0) {
             res.json({
                 err: 1,
-                msg: '该用户名已经被使用'
+                msg: '用户名已经被使用'
             });
         } else {
             res.json({
                 err: 0,
-                msg: '该用户名没被使用'
+                msg: '用户名没被使用'
             });
         }
     } catch (e) {
@@ -82,12 +82,12 @@ exports.checkEmail = async (req, res) => {
         if (users.length > 0) {
             res.json({
                 err: 1,
-                msg: '该Email已经被注册'
+                msg: 'Email已经被注册'
             });
         } else {
             res.json({
                 err: 0,
-                msg: '该Email还没被注册'
+                msg: 'Email还没被注册'
             });
         }
     } catch (e) {

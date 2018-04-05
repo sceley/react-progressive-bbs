@@ -39,9 +39,9 @@ ul.media-right li {
 }
 .editor-tool-bar {
     background: transparent;
-	border: 1px solid #ddd;
-	border-radius: 4px 4px 0 0;
-    padding: 0;
+	border: 1px solid #e8e8e8;
+	border-radius: 2px 2px 0 0;
+    padding: 5px 0;
     margin: 0;
 }
 .editor-tool-bar .tool-item {
@@ -52,4 +52,22 @@ ul.media-right li {
 }
 .editor-tool-bar .tool-item:first-child {
     margin: 0 12px 0 29px;
+}
+.topic-title h2 {
+    margin: 0;
+    padding: 0;
+}
+.topic-title .item-list {
+    padding: 0;
+    margin: 0;
+    
+}
+.topic-title .item-list li {
+    display: inline-block;
+    padding-right: 24px;
+    color: #838383;
+    font-size: 12px;
+}
+.topic-title .item-list li .item-label {
+    margin-right: 5px;
 }

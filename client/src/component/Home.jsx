@@ -8,13 +8,13 @@ export default class Container extends Component {
             <div className="Container">
                 <Tabs defaultActiveKey="1">
                     <TabPane tab="全部" key="1">
-                        <Tab/>
+                        <Tab tab=""/>
                     </TabPane>
                     <TabPane tab="技术" key="2">
-                        <Tab/>
+                        <Tab tab="tech"/>
                     </TabPane>
                     <TabPane tab="生活" key="3">
-                        <Tab/>
+                        <Tab tab="life"/>
                     </TabPane>
                 </Tabs>
             </div>

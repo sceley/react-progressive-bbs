@@ -154,7 +154,7 @@ exports.comment = async (req, res) => {
             })
         });
         await new Promise((resolve, reject) => {
-            let sql = "insert into Comment(author, body, tid, createAt) values(?, ?, ?, ?, ?)";
+            let sql = "insert into Comment(author, body, tid, createAt) values(?, ?, ?, ?)";
             db.query(sql, [author, body.body, id, createAt], (err) => {
                 if (err) {
                     reject(err);

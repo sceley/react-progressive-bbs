@@ -68,7 +68,7 @@ exports.logup = async (req, res) => {
             })
         });
         if (emails_count > 0) {
-            res.json({
+            return res.json({
                 err: 1,
                 msg: '该邮箱已经被注册'
             });

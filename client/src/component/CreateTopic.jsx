@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import { Input, Button, Form, Select, Icon, Modal, Upload } from 'antd';
+import { Input, Button, Form, Select, Icon, Modal, Upload, message } from 'antd';
 import Editor from '../common/Editor';
+import config from '../config';
 const FormItem = Form.Item;
 const Option = Select.Option;
 class CreateTopicForm extends Component {
@@ -9,8 +10,27 @@ class CreateTopicForm extends Component {
         this.props.form.validateFields((err, values) => {
             if (!err) {
                 let body = this.refs.editor.getValue();
-                values.body = body;
-                console.log('Received values of form: ', values);
+                if(body) {
+                    values.body = body;
+                } else {
+                    return;
+                }
+                fetch(`${config.server}/api/topic/create`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-access-token': localStorage.token
+                    },
+                    body: JSON.stringify(values)
+                }).then(res => {
+                    if (res.ok)
+                        return res.json();
+                }).then(json => {
+                    if (json && !json.err) {
+                        this.props.history.push('/');
+                        message.info(json.msg);
+                    }
+                });
             }
         });
     }
@@ -24,7 +44,7 @@ class CreateTopicForm extends Component {
                     >
                         {getFieldDecorator('tab', {
                             rules: [{
-                                required: true, message: 'Please input your password!',
+                                required: true, message: '请选择板块!',
                             }],
                         })(
                             <Select>
@@ -38,7 +58,7 @@ class CreateTopicForm extends Component {
                     >
                         {getFieldDecorator('title', {
                             rules: [{
-                                required: true, message: 'Please input your E-mail!',
+                                required: true, message: '请输入标题!',
                             }],
                         })(
                             <Input placeholder="标题" />
