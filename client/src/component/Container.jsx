@@ -7,10 +7,30 @@ import Logup from './Logup';
 import CreateTopic from './CreateTopic';
 import ForgotPass from './ForgotPass';
 import Topic from './Topic';
+import LoginCallback from './LoginCallback';
+import Setting from './Setting';
+import User from './User';
 import './Container.css';
 const { Header, Content, Footer, Sider } = Layout;
 const Search = Input.Search;
 export default class Container extends Component {
+    state = {
+        login: false
+    }
+    handleLogout = () => {
+        delete localStorage.token;
+        this.setState({
+            login: false
+        });
+        this.props.history.push('/');
+    }
+    componentDidMount = () => {
+        if (localStorage.token) {
+            this.setState({
+                login: true
+            });
+        }
+    }
     render () {
         return (
             <div className="Container">
@@ -29,17 +49,17 @@ export default class Container extends Component {
                             style={{ width: 250 }}
                         />
                         {
-                            localStorage.token?
+                            this.state.login?
                             <ul className="media-right">
                                 <li>
-                                    <Link to="/login">
+                                    <Link to="/setting">
                                         设置
                                     </Link>
                                 </li>
                                 <li>
-                                    <Link to="/logup">
+                                    <a onClick={this.handleLogout}>
                                         退出
-                                    </Link>
+                                    </a>
                                 </li>
                             </ul>
                             :
@@ -58,31 +78,17 @@ export default class Container extends Component {
                         }
                     </Header>
                     <Content style={{ marginTop: '24px', padding: '0 50px' }}>
-                        <Layout>
-                            <Content style={{ background: '#fff', padding: 24, marginRight: 24, minHeight: 280 }}>
-                                <Switch>
-                                    <Route exact path={`${this.props.match.url}`} component={Home} />
-                                    <Route path={`${this.props.match.url}login`} component={Login} />
-                                    <Route path={`${this.props.match.url}logup`} component={Logup} />
-                                    <Route path={`${this.props.match.url}forgotpassword`} component={ForgotPass} />
-                                    <Route path={`${this.props.match.url}topic/create`} component={CreateTopic} />
-                                    <Route path={`${this.props.match.url}topic/:id`} component={Topic} />
-                                </Switch>
-                            </Content>
-                            <Sider width={250} style={{ background: '#f0f2f5' }}>
-                                <Card 
-                                    title="无人回复的话题"
-                                >
-                                </Card>
-                                <Card
-                                    style={{marginTop: '24px'}}
-                                >
-                                    <Link to="/topic/create">
-                                        <Button type="primary" style={{width: '100%'}}>发表话题</Button>
-                                    </Link>
-                                </Card>
-                            </Sider>
-                        </Layout>
+                        <Switch>
+                            <Route exact path={`${this.props.match.url}`} component={Home} />
+                            <Route exact path={`${this.props.match.url}login`} component={Login} />
+                            <Route path={`${this.props.match.url}login/callback`} component={LoginCallback}/>
+                            <Route path={`${this.props.match.url}logup`} component={Logup} />
+                            <Route path={`${this.props.match.url}forgotpassword`} component={ForgotPass} />
+                            <Route path={`${this.props.match.url}topic/create`} component={CreateTopic} />
+                            <Route path={`${this.props.match.url}topic/:id`} component={Topic} />
+                            <Route path={`${this.props.match.url}setting`} component={Setting} />
+                            <Route path={`${this.props.match.url}user/:id`} component={User} />
+                        </Switch>
                     </Content>
                     <Footer style={{ textAlign: 'center' }}>
                         ©2018 Created by QinYongLi

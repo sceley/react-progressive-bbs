@@ -1,11 +1,14 @@
 import React, { Component } from 'react';
-import { List, Avatar, Card, Button, message } from 'antd';
+import { Layout, List, Avatar, Card, Button, message } from 'antd';
 import moment from 'moment';
 import Editor from '../common/Editor';
 import config from '../config';
 import Markdown from 'markdown-it';
 import hljs from 'highlightjs';
 import 'highlightjs/styles/atom-one-light.css';
+import NotRepTopic from '../common/NotRepTopic';
+import Profile from '../common/Profile';
+const { Content, Sider } = Layout;
 const md = new Markdown({
     highlight: function (str, lang) {
         if (lang && hljs.getLanguage(lang)) {
@@ -42,13 +45,14 @@ const Title = (props) => (
                     }
                 </em>
             </li>
-        </ul>
+        </ul> 
     </div>
 );
 export default class Topic extends Component {
     state = {
         topic: '',
-        comments: []
+        comments: [],
+        user: ''
     }
     componentWillMount = () => {
         let id = this.props.match.params.id
@@ -61,6 +65,20 @@ export default class Topic extends Component {
                 this.setState({
                     topic: json.topic,
                     comments: json.comments
+                });
+                this.pullUserInfo(json.topic.uid);
+            }
+        });
+    }
+    pullUserInfo = (id) => {
+        fetch(`${config.server}/api/user/${id}/info`)
+        .then(res => {
+            if (res.ok)
+                return res.json();
+        }).then(json => {
+            if (json && !json.err) {
+                this.setState({
+                    user: json.user
                 });
             }
         });
@@ -90,39 +108,47 @@ export default class Topic extends Component {
     render() {
         return (
             <div className="Tab">
-                <Card
-                    title={<Title topic={this.state.topic}/>}
-                >
-                    <div dangerouslySetInnerHTML={{
-                        __html: md.render(this.state.topic.body || '')
-                    }}/> 
-                </Card>
-                <Card
-                    title={<div>{this.state.comments.length}个回复</div>}
-                    style={{marginTop: 24}}
-                >
-                    <List
-                        itemLayout="horizontal"
-                        dataSource={this.state.comments}
-                        bordered={true}
-                        renderItem={item => (
-                            <List.Item 
-                                actions={[<span>{moment(item.CreateAt).format("YYYY-MM-DD HH:MM")}</span>]}
-                            >
-                                <List.Item.Meta
-                                    avatar={<Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />}
-                                    description={<div dangerouslySetInnerHTML={{
-                                        __html: md.render(item.body || '')
-                                    }} />}
-                                />
-                            </List.Item>
-                        )}
-                    />
-                </Card>
-                <div style={{marginTop: 24}}>
-                    <Editor ref="editor" />
-                    <Button onClick={this.handleSubmit} style={{marginTop: 24}} type="primary">回复</Button>
-                </div>
+                <Layout>
+                    <Content style={{ background: '#fff', padding: 24, marginRight: 24, minHeight: 280 }}>
+                        <Card
+                            title={<Title topic={this.state.topic} />}
+                        >
+                            <div dangerouslySetInnerHTML={{
+                                __html: md.render(this.state.topic.body || '')
+                            }} />
+                        </Card>
+                        <Card
+                            title={<div>{this.state.comments.length}个回复</div>}
+                            style={{ marginTop: 24 }}
+                        >
+                            <List
+                                itemLayout="horizontal"
+                                dataSource={this.state.comments}
+                                bordered={true}
+                                renderItem={item => (
+                                    <List.Item
+                                        actions={[<span>{moment(item.CreateAt).format("YYYY-MM-DD HH:MM")}</span>]}
+                                    >
+                                        <List.Item.Meta
+                                            avatar={<Avatar src={item.avatar} />}
+                                            description={<div dangerouslySetInnerHTML={{
+                                                __html: md.render(item.body || '')
+                                            }} />}
+                                        />
+                                    </List.Item>
+                                )}
+                            />
+                        </Card>
+                        <div style={{ marginTop: 24 }}>
+                            <Editor ref="editor" />
+                            <Button onClick={this.handleSubmit} style={{ marginTop: 24 }} type="primary">回复</Button>
+                        </div>
+                    </Content>
+                    <Sider width={250} style={{ background: '#f0f2f5' }}>
+                        <Profile user={this.state.user}/>
+                        <NotRepTopic style={{ marginTop: 24 }} />
+                    </Sider>
+                </Layout>
             </div>
         );
     }

@@ -4,6 +4,8 @@ const http = require('http');
 const log4js = require('./common/log');
 const config = require('./config');
 const router = require('./router');
+const passport = require('passport');
+const GitHubStrategy = require('passport-github').Strategy;
 const app = express();
 const server = http.createServer(app);
 passport.serializeUser(function (profile, done) {

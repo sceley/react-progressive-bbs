@@ -5,15 +5,16 @@ db.connect();
 let table1 = `
 			create table if not exists User(
 			id int unsigned auto_increment, 
-			username varchar(10),
+			githubId int unsigned,
+			username varchar(20),
 			password varchar(100),
 			email varchar(50),
 			avatar varchar(100),
 			sex boolean default 1,
 			website varchar(50),
-			location varchar(10),
+			location varchar(20),
 			introduction varchar(50) default '这家伙很懒，什么个性签名都没有留下',
-			github varchar(10),
+			github varchar(20),
 			createAt datetime,
 			updateAt datetime,
 			primary key(id))

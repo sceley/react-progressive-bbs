@@ -31,7 +31,7 @@ export default class Tab extends Component {
                     renderItem={item => (
                         <List.Item actions={[<span>{moment(item.CreateAt).format("YYYY-MM-DD HH:MM")}</span>]}>
                             <List.Item.Meta
-                                avatar={<Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />}
+                                avatar={<Avatar src={item.avatar} />}
                                 title={
                                     <Link to={`/topic/${item.id}`}>
                                         <Tag color="#87d068">

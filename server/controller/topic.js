@@ -79,6 +79,30 @@ exports.getTopics = async (req, res) => {
         });
     }
 };
+exports.notRepTopics = async (req, res) => {
+    try {
+        let topics = await new Promise((resolve, reject) => {
+            let sql = `select id, title from Topic order by createAt desc limit ?`;
+            db.query(sql, [5], (err, topics) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(topics);
+                }
+            });
+        });
+        res.json({
+            err: 0,
+            topics
+        });
+    } catch (e) {
+        logger.error(`notRepTopics_handle->${e}`);
+        res.json({
+            err: 1,
+            msg: '服务器出错了'
+        });
+    }
+};
 exports.getTopic = async (req, res) => {
     try {
         let id = req.params.id;
@@ -88,7 +112,8 @@ exports.getTopic = async (req, res) => {
         else
             uid = '';
         let topic = await new Promise((resolve, reject) => {
-            let sql = "select * from Topic where id=?";
+            let sql =  `select Topic.id, tab, author, title, body, Topic.createAt, User.id as uid 
+            from Topic left join User on User.username=Topic.author where Topic.id=?`;
             db.query(sql, [id], (err, topics) => {
                 if (err) {
                     reject(err);

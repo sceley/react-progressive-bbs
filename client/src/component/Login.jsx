@@ -20,7 +20,6 @@ class LoginForm extends Component {
                }).then(json => {
                    if (json && !json.err) {
                         localStorage.token = json.token;
-                        message.info(json.msg);
                         this.props.history.push('/');
                    } else {
                        message.error(json.msg);
@@ -73,6 +72,10 @@ class LoginForm extends Component {
                             <Button type="primary" htmlType="submit">
                                 登陆
                             </Button>
+                        </div>
+                        <div>
+                            其他登陆：
+                            <a href={`${config.server}/api/auth/github`}><Icon type="github" /></a>
                         </div>
                         <Link to="/logup">现在注册!</Link>
                     </FormItem>

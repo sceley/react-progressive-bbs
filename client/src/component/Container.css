@@ -71,3 +71,11 @@ ul.media-right li {
 .topic-title .item-list li .item-label {
     margin-right: 5px;
 }
+.profile-list {
+    padding: 0;
+    margin: 0;
+}
+.profile-list li {
+    list-style: none;
+    margin-bottom: 12px;
+}
