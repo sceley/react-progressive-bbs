@@ -89,3 +89,15 @@ ul.media-right li {
 img {
     max-width: 100%;
 }
+.topic-list-item:hover {
+    color: '#1890ff';
+}
+.topic-list-item {
+    color: rgba(0, 0, 0, 0.65);
+    background-color: transparent;
+}
+.list-item-meta {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+}

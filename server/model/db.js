@@ -27,6 +27,9 @@ let table2 = `
 			title varchar(50),
 			body longtext,
 			createAt datetime,
+			comment_count int unsigned,
+			collect_count int unsigned,
+			visit_count int unsigned,
 			primary key(id))
             charset=utf8`;
 let table3 = `
@@ -51,21 +54,21 @@ let table4 = `
 			foreign key(uid) references User(id),
 			foreign key(tid) references Topic(id))
             charset=utf8`;
-let table5 = `
-            create table if not exists CLike(
-            id int unsigned auto_increment,
-            uid int unsigned,
-            tid int unsigned,
-            cid int unsigned,
-            primary key(id),
-            foreign key(uid) references User(id),
-            foreign key(tid) references Topic(id),
-            foreign key(cid) references Comment(id))
-            charset=utf8`;
+// let table5 = `
+//             create table if not exists CLike(
+//             id int unsigned auto_increment,
+//             uid int unsigned,
+//             tid int unsigned,
+//             cid int unsigned,
+//             primary key(id),
+//             foreign key(uid) references User(id),
+//             foreign key(tid) references Topic(id),
+//             foreign key(cid) references Comment(id))
+//             charset=utf8`;
 db.query(table1);
 db.query(table2);
 db.query(table3);
 db.query(table4);
-db.query(table5);
+// db.query(table5);
 
 module.exports = db;

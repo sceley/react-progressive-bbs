@@ -19,7 +19,9 @@ const checkEmail = require('./controller/checkout').checkEmail;
 const createTopic = require('./controller/topic').createTopic;
 const getTopics = require('./controller/topic').getTopics;
 const getTopic = require('./controller/topic').getTopic;
+const deleteTopic = require('./controller/topic').deleteTopic;
 const comment = require('./controller/topic').comment;
+const deleteComment = require('./controller/topic').deleteComment;
 const collect = require('./controller/topic').collect;
 const notRepTopics = require('./controller/topic').notRepTopics;
 const uploadImage = require('./controller/upload').uploadImage;
@@ -42,6 +44,10 @@ router.get('/api/topics/notreply', notRepTopics);
 router.get('/api/user/info', auth_user_login, userInfo);
 router.get('/api/user/:id/info', userInfoById);
 router.get('/api/user/:id', user);
+
+//delete
+router.delete('/api/topic/:id', auth_user_login, deleteTopic);
+router.delete('/api/topic/:tid/comment/:cid', auth_user_login, deleteComment);
 
 //middleware
 router.use(bodyparser.json());

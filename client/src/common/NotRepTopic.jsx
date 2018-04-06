@@ -31,7 +31,9 @@ export default class NotRepTopic extends Component {
                         dataSource={this.state.topics}
                         renderItem={item => (
                             <List.Item>
-                                <Link to={`/topic/${item.id}`}>{item.title}</Link>
+                                <h4>
+                                    <Link className="topic-list-item" to={`/topic/${item.id}`}>{item.title}</Link>
+                                </h4>
                             </List.Item>
                         )}
                     />

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import { Layout, List, Avatar, Card, Button, message, Icon } from 'antd';
+import { Layout, List, Avatar, Card, Button, message, Icon, Tag } from 'antd';
 import moment from 'moment';
 import Editor from '../common/Editor';
 import config from '../config';
@@ -26,12 +26,29 @@ const Title = (props) => (
     <div className="topic-title">
         <h2>
             {props.topic.title}
-            <a onClick={props.handleCollect}>
-                {
-                    props.collected ? <Icon style={{ float: 'right' }} type="heart" />:<Icon style={{float: 'right'}} type="heart-o" />
-                }
-                
-            </a>
+            {
+                props.me_id ?
+                    <div style={{ float: 'right', fontSize: 16 }}>
+                        {
+                            props.me_id == props.user.id ?
+                                <a style={{ marginLeft: 5 }} onClick={props.handleDeleteTopic}>
+                                    <Icon type="delete" />
+                                </a>
+                                :
+                                <a onClick={props.handleCollect}>
+                                    {
+                                        props.collected ?
+                                            <Icon type="heart" />
+                                            :
+                                            <Icon type="heart-o" />
+                                    }
+                                </a>
+                                
+                        }
+                    </div>
+                    :
+                    null
+            }
         </h2>
         <ul className="item-list">
             <li>
@@ -50,11 +67,11 @@ const Title = (props) => (
                 <em>
                     <span className="item-label">板块：</span>
                     {
-                        props.topic.tab == 'tech'?"技术":"生活"
+                        props.topic.tab == 'tech' ? "技术" : "生活"
                     }
                 </em>
             </li>
-        </ul> 
+        </ul>
     </div>
 );
 export default class Topic extends Component {
@@ -62,7 +79,8 @@ export default class Topic extends Component {
         topic: '',
         comments: [],
         user: '',
-        collected: ''
+        collected: '',
+        me_id: ''
     }
     componentDidMount = () => {
         let id = this.props.match.params.id
@@ -79,7 +97,8 @@ export default class Topic extends Component {
                 this.setState({
                     topic: json.topic,
                     comments: json.comments,
-                    collected: json.collected
+                    collected: json.collected,
+                    me_id: json.me_id
                 });
                 this.pullUserInfo(json.topic.uid);
             } else {
@@ -90,18 +109,18 @@ export default class Topic extends Component {
     componentWillReceiveProps = this.componentDidMount;
     pullUserInfo = (id) => {
         fetch(`${config.server}/api/user/${id}/info`)
-        .then(res => {
-            if (res.ok)
-                return res.json();
-        }).then(json => {
-            if (json && !json.err) {
-                this.setState({
-                    user: json.user
-                });
-            } else {
-                message.error(json.msg);
-            }
-        });
+            .then(res => {
+                if (res.ok)
+                    return res.json();
+            }).then(json => {
+                if (json && !json.err) {
+                    this.setState({
+                        user: json.user
+                    });
+                } else {
+                    message.error(json.msg);
+                }
+            });
     }
     handleSubmit = () => {
         let id = this.props.match.params.id;
@@ -155,13 +174,62 @@ export default class Topic extends Component {
     handleEnter = (author) => {
         this.refs.editor.setValue(`@${author} `);
     }
+    handleDeleteTopic = () => {
+        let id = this.state.topic.id;
+        fetch(`${config.server}/api/topic/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'x-access-token': localStorage.token
+            }
+        }).then(res => {
+            if (res.ok)
+                return res.json();
+        }).then(json => {
+            if (json && !json.err) {
+                this.props.history.push('/');
+            }
+        });
+    }
+    handleDeleteComment = (cid) => {
+        let tid = this.state.topic.id;
+        fetch(`${config.server}/api/topic/${tid}/comment/${cid}`, {
+            method: 'DELETE',
+            headers: {
+                'x-access-token': localStorage.token
+            }
+        }).then(res => {
+            if (res.ok)
+                return res.json();
+        }).then(json => {
+            if (json && !json.err) {
+                let comments = this.state.comments;
+                comments = comments.filter(comment => {
+                    return comment.id != cid;
+                });
+                this.setState({
+                    comments: comments
+                });
+                message.info(json.msg);
+            } else {
+                message.error(json.msg);
+            }
+        });
+    }
     render() {
         return (
             <div className="Tab">
                 <Layout>
                     <Content style={{ background: '#fff', padding: 24, marginRight: 24, minHeight: 280 }}>
                         <Card
-                            title={<Title handleCollect={this.handleCollect} topic={this.state.topic} collected={this.state.collected} />}
+                            title={
+                                <Title
+                                    handleCollect={this.handleCollect}
+                                    me_id={this.state.me_id}
+                                    user={this.state.user}
+                                    topic={this.state.topic}
+                                    collected={this.state.collected}
+                                    handleDeleteTopic={this.handleDeleteTopic}
+                                />}
                         >
                             <div dangerouslySetInnerHTML={{
                                 __html: md.render(this.state.topic.body || '')
@@ -178,20 +246,28 @@ export default class Topic extends Component {
                                 renderItem={item => (
                                     <List.Item
                                         actions={[
-                                            <span>{moment(item.CreateAt).format("YYYY-MM-DD HH:MM")}</span>,
-                                            <a onClick={() => this.handleEnter(item.author)}><Icon type="enter" /></a>
+                                            <a onClick={() => this.handleEnter(item.author)}><Icon type="enter" /></a>,
+                                            <a onClick={() => this.handleDeleteComment(item.id)}><Icon type="delete" /></a>
                                         ]}
                                     >
-                                        <List.Item.Meta
-                                            avatar={
-                                                <Link to={`/user/${item.uid}`}>
-                                                    <Avatar src={item.avatar} />
-                                                </Link>
-                                            }
-                                            description={<div dangerouslySetInnerHTML={{
-                                                __html: md.render(item.body || '')
-                                            }} />}
-                                        />
+                                        <div className="list-item-meta">
+                                            <Avatar style={{ marginRight: 16 }} src={item.avatar} />
+                                            <div>
+                                                <div style={{ marginBottom: 16 }}>
+                                                    <em>
+                                                        <span className="item-label">作者：</span>
+                                                        {item.author}
+                                                    </em>
+                                                    <em style={{ marginLeft: 16 }}>
+                                                        <span className="item-label">时间：</span>
+                                                        {moment(item.CreateAt).format("YYYY-MM-DD HH:MM")}
+                                                    </em>
+                                                </div>
+                                                <div dangerouslySetInnerHTML={{
+                                                    __html: md.render(item.body || '')
+                                                }} />
+                                            </div>
+                                        </div>
                                     </List.Item>
                                 )}
                             />
@@ -204,7 +280,7 @@ export default class Topic extends Component {
                         </div>
                     </Content>
                     <Sider width={250} style={{ background: '#f0f2f5' }}>
-                        <Profile user={this.state.user}/>
+                        <Profile user={this.state.user} />
                         <NotRepTopic style={{ marginTop: 24 }} />
                     </Sider>
                 </Layout>

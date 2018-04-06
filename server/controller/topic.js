@@ -152,7 +152,8 @@ exports.getTopic = async (req, res) => {
             err: 0,
             topic,
             comments,
-            collected
+            collected,
+            me_id: uid
         });
     } catch (e) {
         logger.error(`getTopic_handle->${e}`);
@@ -253,4 +254,113 @@ exports.collect = async (req, res) => {
             msg: '服务器出错了'
         });
     }
-}
+};
+exports.deleteTopic = async (req, res) => {
+    try {
+        let uid = req.session.uid;
+        let id = req.params.id;
+        let user = await new Promise((resolve, reject) => {
+            let sql = "select username from User where id=?";
+            db.query(sql, [uid], (err, users) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(users[0]);
+                }
+            });
+        });
+        let topic = await new Promise((resolve, reject) => {
+            let sql = "select id from Topic where id=? and author=?";
+            db.query(sql, [id, user.username], (err, topics) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(topics[0]);
+                }
+            });
+        });
+        if (!topic) {
+            return res.json({
+                err: 1,
+                msg: '这话题不是您的'
+            });
+        }
+        await new Promise((resolve, reject) => {
+            let sql = "delete from Collect where tid=?";
+            db.query(sql, [topic.id], (err) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve();
+                }
+            });
+        });
+        await new Promise((resolve, reject) => {
+            let sql = "delete from Comment where tid=?";
+            db.query(sql, [topic.id], (err) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve();
+                }
+            });
+        });
+        await new Promise((resolve, reject) => {
+            let sql = "delete from Topic where id=?";
+            db.query(sql, [topic.id], (err) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve();
+                }
+            });
+        });
+        res.json({
+            err: 0,
+            msg: '删除成功'
+        });
+    } catch (e) {
+        logger.error(`deleteTopic_handle->${e}`);
+        res.json({
+            err: 1,
+            msg: '服务器出错了'
+        });
+    }
+};
+exports.deleteComment = async (req, res) => {
+    try {
+        let uid = req.session.uid;
+        let tid = req.params.tid;
+        let cid = req.params.cid;
+        let user = await new Promise((resolve, reject) => {
+            let sql = "select username from User where id=?";
+            db.query(sql, [uid], (err, users) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(users[0]);
+                }
+            });
+        });
+        await new Promise((resolve, reject) => {
+            let sql = "delete from Comment where id=? and tid=? and author=?";
+            db.query(sql, [cid, tid, user.username], (err) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve();
+                }
+            });
+        });
+        res.json({
+            err: 0,
+            msg: '删除成功'
+        });
+    } catch (e) {
+        logger.error(`deleteComment_handle->${e}`);
+        res.json({
+            err: 1,
+            msg: '服务器出错了'
+        });
+    }
+};
