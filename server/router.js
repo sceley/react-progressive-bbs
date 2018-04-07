@@ -12,7 +12,9 @@ const userInfo = require('./controller/user').userInfo;
 const userInfoById = require('./controller/user').userInfoById;
 const user = require('./controller/user').user;
 const userInfoEdit = require('./controller/user').userInfoEdit;
+const forgotPassword = require('./controller/user').forgotPassword;
 const getCaptcha = require('./controller/captcha').getCaptcha;
+const getCaptchaFromUsername = require('./controller/captcha').getCaptchaFromUsername;
 const checkUsername = require('./controller/checkout').checkUsername;
 const checkCaptcha = require('./controller/checkout').checkCaptcha;
 const checkEmail = require('./controller/checkout').checkEmail;
@@ -25,6 +27,7 @@ const deleteComment = require('./controller/topic').deleteComment;
 const collect = require('./controller/topic').collect;
 const notRepTopics = require('./controller/topic').notRepTopics;
 const uploadImage = require('./controller/upload').uploadImage;
+const searchUserOrTopic = require('./controller/search').searchUserOrTopic;
 
 const auth_user_login = require('./middleware/oauth').auth_user_login;
 const convert_to_user = require('./middleware/convert').convert_to_user;
@@ -44,6 +47,7 @@ router.get('/api/topics/notreply', notRepTopics);
 router.get('/api/user/info', auth_user_login, userInfo);
 router.get('/api/user/:id/info', userInfoById);
 router.get('/api/user/:id', user);
+router.get('/api/search', searchUserOrTopic);
 
 //delete
 router.delete('/api/topic/:id', auth_user_login, deleteTopic);
@@ -57,7 +61,9 @@ router.post('/api/login', login);
 router.post('/api/logup', logup);
 router.post('/api/upload/image', auth_user_login, multer().single('image'), uploadImage);
 router.post('/api/user/info/edit', auth_user_login, userInfoEdit);
+router.post('/api/user/forgotpassword', forgotPassword);
 router.post('/api/getcaptcha', getCaptcha);
+router.post('/api/getcaptcha/from/username', getCaptchaFromUsername);
 router.post('/api/checkusername', checkUsername);
 router.post('/api/checkcaptcha', checkCaptcha);
 router.post('/api/checkemail', checkEmail);

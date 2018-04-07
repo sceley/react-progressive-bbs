@@ -29,13 +29,20 @@ export default class Tab extends Component {
                     dataSource={this.state.topics}
                     bordered={true}
                     renderItem={item => (
-                        <List.Item actions={[<span>{moment(item.CreateAt).format("YYYY-MM-DD HH:MM")}</span>]}>
+                        <List.Item actions={[<span>{moment(item.createAt).format("YYYY-MM-DD HH:mm:ss")}</span>]}>
                             <List.Item.Meta
-                                avatar={<Avatar src={item.avatar} />}
+                                avatar={
+                                    <Link to={`user/${item.uid}`}>
+                                        <Avatar src={item.avatar} />
+                                    </Link>
+                                }
                                 title={
                                     <Link to={`/topic/${item.id}`}>
+                                        <em style={{marginRight: 16}}>
+                                            {`${item.collects_count}/${item.comments_count}/${item.visit_count}`}
+                                        </em>
                                         <Tag color="#87d068">
-                                            {item.tab == 'tech'?"技术":"生活"}
+                                            {item.tab === 'tech'?"技术":"生活"}
                                         </Tag>
                                         {item.title}
                                     </Link>

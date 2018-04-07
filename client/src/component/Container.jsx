@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { BrowserRouter as Router, Route, Switch, Link } from 'react-router-dom';
-import { Layout, Menu, Input, Button, Card } from 'antd';
+import { Route, Switch, Link } from 'react-router-dom';
+import { Layout, Input } from 'antd';
 import Home from './Home';
 import Login from './Login';
 import Logup from './Logup';
@@ -10,8 +10,9 @@ import Topic from './Topic';
 import LoginCallback from './LoginCallback';
 import Setting from './Setting';
 import User from './User';
+import config from '../config';
 import './Container.css';
-const { Header, Content, Footer, Sider } = Layout;
+const { Header, Content, Footer } = Layout;
 const Search = Input.Search;
 export default class Container extends Component {
     state = {
@@ -31,6 +32,20 @@ export default class Container extends Component {
             });
         }
     }
+    handleSearch = (content) => {
+        fetch(`${config.server}/api/search?content=${content}`)
+        .then(res => {
+            if (res.ok)
+                return res.json();
+        }).then(json => {
+            if (json && !json.err) {
+                if (json.result) {
+                    this.props.history.push(`/${json.field}/${json.result.id}`);
+                }
+            }
+        });
+    }
+    componentWillReceiveProps = this.componentDidMount;
     render () {
         return (
             <div className="Container">
@@ -43,7 +58,7 @@ export default class Container extends Component {
                         </div>
                         <div className="media-left">一个分享与发现的地方</div>
                         <Search
-                            placeholder="搜索"
+                            placeholder="搜索用户/话题"
                             onSearch={this.handleSearch}
                             enterButton
                             style={{ width: 250 }}

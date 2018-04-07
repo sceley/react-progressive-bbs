@@ -67,20 +67,6 @@ class SettingForm extends Component {
                     )}
                 </FormItem>
                 <FormItem
-                    label="邮箱"
-                >
-                    {getFieldDecorator('email', {
-                        rules: [{
-                            type: 'email', message: '邮箱格式不正确!',
-                        }, {
-                            required: true, message: '请输入邮箱!' 
-                        }],
-                        initialValue: this.state.user.email
-                    })(
-                        <Input prefix={<Icon type="mail" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="邮箱" />
-                    )}
-                </FormItem>
-                <FormItem
                     label="性别"
                 >
                     {getFieldDecorator('sex', {
@@ -95,45 +81,37 @@ class SettingForm extends Component {
                     )}
                 </FormItem>
                 <FormItem
-                    label="地点"
+                    label={<span className="content-label">地点</span>}
                 >
                     {getFieldDecorator('location', {
-                        rules: [{
-                            required: true, message: '请输入地点!'
-                        }], initialValue: this.state.user.location
+                        initialValue: this.state.user.location
                     })(
                         <Input prefix={<Icon type="environment-o" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="地点" />
                     )}
                 </FormItem>
                 <FormItem
-                    label="个人网站"
+                    label={<span className="content-label">个人网站</span>}
                 >
                     {getFieldDecorator('website', {
-                        rules: [{
-                            required: true, message: '请输入网站!'
-                        }], initialValue: this.state.user.website
+                        initialValue: this.state.user.website
                     })(
                         <Input prefix={<Icon type="global" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="个人网站" />
                     )}
                 </FormItem>
                 <FormItem
-                    label="Github"
+                    label={<span className="content-label">Github</span>}
                 >
                     {getFieldDecorator('github', {
-                        rules: [{
-                            required: true, message: '请输入Github!'
-                        }], initialValue: this.state.user.github
+                        initialValue: this.state.user.github
                     })(
-                        <Input prefix={<Icon type="github" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="github" />
+                        <Input prefix={<Icon type="github" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="eg. sceley" />
                     )}
                 </FormItem>
                 <FormItem
-                    label="个人简介"
+                    label={<span className="content-label">个人简介</span>}
                 >
                     {getFieldDecorator('introduction', {
-                        rules: [{
-                            required: true, message: '请输入个人简介!'
-                        }], initialValue: this.state.user.introduction
+                        initialValue: this.state.user.introduction
                     })(
                         <TextArea rows={4} />
                     )}
@@ -193,4 +171,19 @@ export default class Setting extends Component {
             </div>
         );
     }
-}
+};
+
+{/* <FormItem
+    label="邮箱"
+>
+    {getFieldDecorator('email', {
+        rules: [{
+            type: 'email', message: '邮箱格式不正确!',
+        }, {
+            required: true, message: '请输入邮箱!'
+        }],
+        initialValue: this.state.user.email
+    })(
+        <Input prefix={<Icon type="mail" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="邮箱" />
+    )}
+</FormItem> */}

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Card, Input, Button, Form, Select, Icon, Modal, Upload, message, Layout } from 'antd';
+import { Card, Input, Button, Form, Select, message, Layout } from 'antd';
 import Editor from '../common/Editor';
 import config from '../config';
 const FormItem = Form.Item;

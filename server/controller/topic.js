@@ -4,7 +4,7 @@ const logger = require('../common/log').getLogger("app");
 exports.createTopic = async (req, res) => {
     try {
         let body = req.body;
-        let createAt = moment().format("YYYY-MM-DD HH:MM");
+        let createAt = moment().format("YYYY-MM-DD HH:mm:ss");
         let uid = req.session.uid;
         if (!(body instanceof Object)) {
             return res.json({
@@ -12,19 +12,9 @@ exports.createTopic = async (req, res) => {
                 msg: '不是json数据格式'
             });
         }
-        let author = await new Promise((resolve, reject) => {
-            let sql = 'select username from User where id=?';
-            db.query(sql, [uid], (err, users) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(users[0].username);
-                }
-            })
-        });
         await new Promise((resolve, reject) => {
-            let sql = "insert into Topic(tab, title, body, author, createAt) values(?, ?, ?, ?, ?)";
-            db.query(sql, [body.tab, body.title, body.body, author, createAt], (err) => {
+            let sql = "insert into Topic(tab, title, body, author_id, createAt) values(?, ?, ?, ?, ?)";
+            db.query(sql, [body.tab, body.title, body.body, uid, createAt], (err) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -54,9 +44,9 @@ exports.getTopics = async (req, res) => {
         if (!tab)
             tab = '%';
         let topics = await new Promise((resolve, reject) => {
-            let sql = `select title, tab, body, avatar, author, 
-                    Topic.id, User.id as uid, Topic.CreateAt from Topic
-                    left join User on Topic.author=User.username 
+            let sql = `select title, tab, body, avatar, username, visit_count, comments_count,
+                    collects_count, Topic.id, User.id as uid, Topic.createAt from Topic
+                    left join User on Topic.author_id=User.id 
                     where tab like ?
                     order by Topic.createAt desc limit ?, ?`;
             db.query(sql, [tab, 10 * (page - 1), 10], (err, topics) => {
@@ -82,8 +72,8 @@ exports.getTopics = async (req, res) => {
 exports.notRepTopics = async (req, res) => {
     try {
         let topics = await new Promise((resolve, reject) => {
-            let sql = `select id, title from Topic order by createAt desc limit ?`;
-            db.query(sql, [5], (err, topics) => {
+            let sql = `select id, title from Topic where comments_count=? order by createAt desc limit ?`;
+            db.query(sql, [0, 5], (err, topics) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -112,8 +102,11 @@ exports.getTopic = async (req, res) => {
         else
             uid = '';
         let topic = await new Promise((resolve, reject) => {
-            let sql =  `select Topic.id, tab, author, title, body, Topic.createAt, User.id as uid 
-            from Topic left join User on User.username=Topic.author where Topic.id=?`;
+            let sql =  `select Topic.id, tab, User.username as author, title, body, Topic.createAt, 
+                        User.id as uid, visit_count, collects_count, comments_count 
+                        from Topic left join User 
+                        on User.id=Topic.author_id
+                        where Topic.id=?`;
             db.query(sql, [id], (err, topics) => {
                 if (err) {
                     reject(err);
@@ -133,18 +126,25 @@ exports.getTopic = async (req, res) => {
             });
         });
         let comments = await new Promise((resolve, reject) => {
-            let sql = `select likeCount, avatar, body, author, mentioner,
-                        Comment.createAt, Comment.id, CLike.id as lid, User.id as uid from Comment 
-                        left join CLike 
-						on CLike.cid=Comment.id and CLike.tid=Comment.tid and CLike.uid=?
-                        left join User 
-                        on Comment.author=User.username
+            let sql = `select avatar, body, User.username as author, Comment.createAt, Comment.id, 
+                        User.id as uid from Comment left join User 
+                        on Comment.author_id=User.id
 						where Comment.tid=?`;
-            db.query(sql, [uid, id], (err, comments) => {
+            db.query(sql, [id], (err, comments) => {
                 if (err) {
                     reject(err);
                 } else {
                     resolve(comments);
+                }
+            });
+        });
+        await new Promise((resolve, reject) => {
+            let sql = `update Topic set visit_count=visit_count+1 where id=?`;
+            db.query(sql, [id], (err) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve();
                 }
             });
         });
@@ -168,20 +168,10 @@ exports.comment = async (req, res) => {
         let id = req.params.id;
         let body = req.body;
         let uid = req.session.uid;
-        let createAt = moment().format("YYYY-MM-DD HH:MM");
-        let author = await new Promise((resolve, reject) => {
-            let sql = 'select Username from User where id=?';
-            db.query(sql, [uid], (err, users) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(users[0].Username);
-                }
-            })
-        });
+        let createAt = moment().format("YYYY-MM-DD HH:mm:ss");
         await new Promise((resolve, reject) => {
-            let sql = "insert into Comment(author, body, tid, createAt) values(?, ?, ?, ?)";
-            db.query(sql, [author, body.body, id, createAt], (err) => {
+            let sql = "insert into Comment(author_id, body, tid, createAt) values(?, ?, ?, ?)";
+            db.query(sql, [uid, body.body, id, createAt], (err) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -189,9 +179,31 @@ exports.comment = async (req, res) => {
                 }
             });
         });
+        await new Promise((resolve, reject) => {
+            let sql = `update Topic set comments_count=comments_count+1 where id=?`;
+            db.query(sql, [id], (err) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve();
+                }
+            });
+        });
+        let comment = await new Promise((resolve, reject) => {
+            let sql = `select Comment.id, User.username as author, avatar, body, Comment.createAt 
+            from Comment left join User on User.id=Comment.author_id
+            where Comment.createAt=?`;
+            db.query(sql, [createAt], (err, comments) => {
+                if (err)
+                    reject(err);
+                else
+                    resolve(comments[0]);
+            }); 
+        });
         res.json({
             err: 0,
-            msg: '评论成功'
+            msg: '评论成功',
+            comment
         });
     } catch (e) {
         logger.error(`comment_handle->${e}`);
@@ -226,15 +238,35 @@ exports.collect = async (req, res) => {
                     }
                 });
             });
+            await new Promise((resolve, reject) => {
+                let sql = `update Topic set collects_count=collects_count-1 where id=?`;
+                db.query(sql, [id], (err) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve();
+                    }
+                });
+            });
             res.json({
                 err: 0,
                 msg: '取消收藏'
             });
         } else {
             await new Promise((resolve, reject) => {
-                let createAt = moment().format("YYYY-MM-DD HH:MM");
+                let createAt = moment().format("YYYY-MM-DD HH:mm:ss");
                 let sql = "insert into Collect(uid, tid, createAt) values(?, ?, ?)";
                 db.query(sql, [uid, id, createAt], (err) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve();
+                    }
+                });
+            });
+            await new Promise((resolve, reject) => {
+                let sql = `update Topic set collects_count=collects_count+1 where id=?`;
+                db.query(sql, [id], (err) => {
                     if (err) {
                         reject(err);
                     } else {
@@ -259,19 +291,9 @@ exports.deleteTopic = async (req, res) => {
     try {
         let uid = req.session.uid;
         let id = req.params.id;
-        let user = await new Promise((resolve, reject) => {
-            let sql = "select username from User where id=?";
-            db.query(sql, [uid], (err, users) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(users[0]);
-                }
-            });
-        });
         let topic = await new Promise((resolve, reject) => {
-            let sql = "select id from Topic where id=? and author=?";
-            db.query(sql, [id, user.username], (err, topics) => {
+            let sql = "select id from Topic where id=? and author_id=?";
+            db.query(sql, [id, uid], (err, topics) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -332,19 +354,35 @@ exports.deleteComment = async (req, res) => {
         let uid = req.session.uid;
         let tid = req.params.tid;
         let cid = req.params.cid;
-        let user = await new Promise((resolve, reject) => {
-            let sql = "select username from User where id=?";
-            db.query(sql, [uid], (err, users) => {
+        let comment = await new Promise((resolve, reject) => {
+            let sql = "select id from Comment where id=? and tid=? and author_id=?";
+            db.query(sql, [cid, tid, uid], (err, comments) => {
                 if (err) {
                     reject(err);
                 } else {
-                    resolve(users[0]);
+                    resolve(comments[0]);
+                }
+            });
+        });
+        if (!comment) {
+            return res.json({
+                err: 1,
+                msg: '这评论不是您的'
+            });
+        }
+        await new Promise((resolve, reject) => {
+            let sql = "delete from Comment where id=? and tid=? and author_id=?";
+            db.query(sql, [cid, tid, uid], (err) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve();
                 }
             });
         });
         await new Promise((resolve, reject) => {
-            let sql = "delete from Comment where id=? and tid=? and author=?";
-            db.query(sql, [cid, tid, user.username], (err) => {
+            let sql = `update Topic set comments_count=comments_count-1 where id=?`;
+            db.query(sql, [cid], (err) => {
                 if (err) {
                     reject(err);
                 } else {

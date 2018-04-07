@@ -141,7 +141,7 @@ class LogupForm extends Component {
             form.setFields({ email: { errors: [new Error("邮箱格式不正确")] } });
             return;
         }
-        if (!(captcha && captcha.length == 6)) {
+        if (!(captcha && captcha.length === 6)) {
             form.setFields({ captcha: { errors: [new Error("验证码应为6个字符")] } });
         } else {
             fetch(`${config.server}/api/checkcaptcha`, {

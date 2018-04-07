@@ -22,26 +22,26 @@ let table1 = `
 let table2 = `
 			create table if not exists Topic(
             id int unsigned auto_increment,
+			author_id int unsigned,
             tab varchar(10),
-			author varchar(10),
 			title varchar(50),
 			body longtext,
 			createAt datetime,
-			comment_count int unsigned,
-			collect_count int unsigned,
-			visit_count int unsigned,
+			comments_count int unsigned default 0,
+			collects_count int unsigned default 0,
+			visit_count int unsigned default 0,
+			foreign key(author_id) references User(id),
 			primary key(id))
             charset=utf8`;
 let table3 = `
 			create table if not exists Comment(
 			id int unsigned auto_increment,
 			tid int unsigned,
-            author varchar(10),
-            likeCount int unsigned default 0,
-			mentioner varchar(10),
+            author_id int unsigned,
 			body longtext,
 			createAt datetime,
-            primary key(id),
+			primary key(id),
+			foreign key(author_id) references User(id),
             foreign key(tid) references Topic(id))
 			charset=utf8`;
 let table4 = `

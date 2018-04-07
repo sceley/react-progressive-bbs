@@ -6,7 +6,7 @@ export default class Profile extends Component {
         return (
             <div className="Profile">
                 <Card
-                    title="个人信息"
+                    title="信息面板"
                     bodyStyle={{textAlign: 'center'}}
                 >
                     <ul className="profile-list">

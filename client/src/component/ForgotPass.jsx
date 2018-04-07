@@ -9,9 +9,29 @@ class LogupForm extends Component {
     }
     handleSubmit = (e) => {
         e.preventDefault();
+        const form = this.props.form;
         this.props.form.validateFieldsAndScroll((err, values) => {
             if (!err) {
-                console.log('Received values of form: ', values);
+                fetch(`${config.server}/api/user/forgotpassword`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(values)
+                }).then(res => {
+                    if (res.ok)
+                        return res.json();
+                }).then(json => {
+                    if (json && !json.err){
+                        this.props.history.push('/');
+                    } else if (json && json.err)  {
+                        if (json.field) {
+                            let error = {};
+                            error[json.field] = { errors: [new Error(json.msg)] }
+                            form.setFields(error);
+                        }
+                    }
+                });
             }
         });
     }
@@ -63,6 +83,37 @@ class LogupForm extends Component {
         const value = e.target.value;
         this.setState({ confirmDirty: this.state.confirmDirty || !!value });
     }
+    getCaptcha = () => {
+        const form = this.props.form;
+        let username = form.getFieldValue('username');
+        if (!(username && username.length >= 2 && username.length <= 20)) {
+            form.setFields({ username: { errors: [new Error("请输入用户名")] } });
+            return;
+        }
+        fetch(`${config.server}/api/getcaptcha/from/username`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                username: username
+            })
+        }).then(res => {
+            if (res.ok)
+                return res.json();
+        }).then(json => {
+            if (json && !json.err) {
+                
+            } else if (json && json.err) {
+                if (json.field) {
+                    let error = {};
+                    error[json.field] = { errors: [new Error(json.msg)] }
+                    console.log(error);
+                    form.setFields(error);
+                }
+            }
+        });
+    }
     render() {
         const { getFieldDecorator } = this.props.form;
         return (
@@ -92,7 +143,7 @@ class LogupForm extends Component {
                                 )}
                             </Col>
                             <Col span={12}>
-                                <Button>获取验证码</Button>
+                                <Button onClick={this.getCaptcha}>获取验证码</Button>
                             </Col>
                         </Row>
                     </FormItem>

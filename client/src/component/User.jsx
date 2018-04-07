@@ -2,24 +2,10 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, Layout, Avatar, List, Tag } from 'antd';
 import config from '../config';
-import Markdown from 'markdown-it';
-import hljs from 'highlightjs';
 import moment from 'moment';
 import NotRepTopic from '../common/NotRepTopic';
 import Profile from '../common/Profile';
 const { Content, Sider } = Layout;
-const md = new Markdown({
-    highlight: function (str, lang) {
-        if (lang && hljs.getLanguage(lang)) {
-            try {
-                return '<pre class="hljs"><code>' +
-                    hljs.highlight(lang, str, true).value +
-                    '</code></pre>';
-            } catch (__) { }
-        }
-        return '<pre class="hljs"><code>' + md.utils.escapeHtml(str) + '</code></pre>';
-    }
-});
 export default class User extends Component {
     state = {
         user: '',
@@ -55,13 +41,17 @@ export default class User extends Component {
                                 dataSource={this.state.topics}
                                 bordered={true}
                                 renderItem={item => (
-                                    <List.Item actions={[<span>{moment(item.CreateAt).format("YYYY-MM-DD HH:MM")}</span>]}>
+                                    <List.Item actions={[<span>{moment(item.CreateAt).format("YYYY-MM-DD hh:mm:ss")}</span>]}>
                                         <List.Item.Meta
-                                            avatar={<Avatar src={item.avatar} />}
+                                            avatar={
+                                                <Link to={`/user/${item.uid}`}>
+                                                    <Avatar src={item.avatar} />
+                                                </Link>
+                                            }
                                             title={
                                                 <Link to={`/topic/${item.id}`}>
                                                     <Tag color="#87d068">
-                                                        {item.tab == 'tech' ? "技术" : "生活"}
+                                                        {item.tab === 'tech' ? "技术" : "生活"}
                                                     </Tag>
                                                     {item.title}
                                                 </Link>
@@ -80,13 +70,17 @@ export default class User extends Component {
                                 dataSource={this.state.collect_topics}
                                 bordered={true}
                                 renderItem={item => (
-                                    <List.Item actions={[<span>{moment(item.CreateAt).format("YYYY-MM-DD HH:MM")}</span>]}>
+                                    <List.Item actions={[<span>{moment(item.CreateAt).format("YYYY-MM-DD hh:mm:ss")}</span>]}>
                                         <List.Item.Meta
-                                            avatar={<Avatar src={item.avatar} />}
+                                            avatar={
+                                                <Link to={`/user/${item.id}`}>
+                                                    <Avatar src={item.avatar} />
+                                                </Link>
+                                            }
                                             title={
                                                 <Link to={`/topic/${item.id}`}>
                                                     <Tag color="#87d068">
-                                                        {item.tab == 'tech' ? "技术" : "生活"}
+                                                        {item.tab === 'tech' ? "技术" : "生活"}
                                                     </Tag>
                                                     {item.title}
                                                 </Link>

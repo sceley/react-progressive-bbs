@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import CodeMirror from 'codemirror';
-import { Button, Icon, Modal, Upload, Card } from 'antd';
+import { Button, Icon, Modal, Upload } from 'antd';
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/mode/markdown/markdown.js';
 import 'codemirror/theme/shadowfox.css';

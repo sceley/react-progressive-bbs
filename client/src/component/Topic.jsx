@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import { Layout, List, Avatar, Card, Button, message, Icon, Tag } from 'antd';
+import { Layout, List, Avatar, Card, Button, message, Icon } from 'antd';
 import moment from 'moment';
 import Editor from '../common/Editor';
 import config from '../config';
@@ -30,7 +30,7 @@ const Title = (props) => (
                 props.me_id ?
                     <div style={{ float: 'right', fontSize: 16 }}>
                         {
-                            props.me_id == props.user.id ?
+                            props.me_id === props.user.id ?
                                 <a style={{ marginLeft: 5 }} onClick={props.handleDeleteTopic}>
                                     <Icon type="delete" />
                                 </a>
@@ -43,7 +43,6 @@ const Title = (props) => (
                                             <Icon type="heart-o" />
                                     }
                                 </a>
-                                
                         }
                     </div>
                     :
@@ -60,15 +59,27 @@ const Title = (props) => (
             <li>
                 <em>
                     <span className="item-label">时间：</span>
-                    {moment(props.topic.createAt).format('YYYY-MM-DD HH:SS')}
+                    {moment(props.topic.createAt).format('YYYY-MM-DD HH:mm:ss')}
                 </em>
             </li>
             <li>
                 <em>
                     <span className="item-label">板块：</span>
                     {
-                        props.topic.tab == 'tech' ? "技术" : "生活"
+                        props.topic.tab === 'tech' ? "技术" : "生活"
                     }
+                </em>
+            </li>
+            <li>
+                <em>
+                    <span className="item-label">浏览数：</span>
+                    {props.topic.visit_count}
+                </em>
+            </li>
+            <li>
+                <em>
+                    <span className="item-label">收藏数：</span>
+                    {props.topic.collects_count}
                 </em>
             </li>
         </ul>
@@ -140,9 +151,8 @@ export default class Topic extends Component {
                 return res.json();
         }).then(json => {
             if (json && !json.err) {
-                value.createAt = moment().format('YYYY-MM-DD HH:SS');
                 this.setState({
-                    comments: [...this.state.comments, value]
+                    comments: [...this.state.comments, json.comment]
                 });
                 this.refs.editor.setValue('');
             } else {
@@ -162,7 +172,6 @@ export default class Topic extends Component {
                 return res.json();
         }).then(json => {
             if (json && !json.err) {
-                message.info(json.msg);
                 this.setState({
                     collected: !this.state.collected
                 });
@@ -204,7 +213,7 @@ export default class Topic extends Component {
             if (json && !json.err) {
                 let comments = this.state.comments;
                 comments = comments.filter(comment => {
-                    return comment.id != cid;
+                    return comment.id !== cid;
                 });
                 this.setState({
                     comments: comments
@@ -236,7 +245,7 @@ export default class Topic extends Component {
                             }} />
                         </Card>
                         <Card
-                            title={<div>{this.state.comments.length}个回复</div>}
+                            title={<div>{this.state.topic.comments_count}个回复</div>}
                             style={{ marginTop: 24 }}
                         >
                             <List
@@ -251,7 +260,9 @@ export default class Topic extends Component {
                                         ]}
                                     >
                                         <div className="list-item-meta">
-                                            <Avatar style={{ marginRight: 16 }} src={item.avatar} />
+                                            <Link to={`/user/${item.uid}`}>
+                                                <Avatar style={{ marginRight: 16 }} src={item.avatar} />
+                                            </Link>
                                             <div>
                                                 <div style={{ marginBottom: 16 }}>
                                                     <em>
@@ -260,7 +271,7 @@ export default class Topic extends Component {
                                                     </em>
                                                     <em style={{ marginLeft: 16 }}>
                                                         <span className="item-label">时间：</span>
-                                                        {moment(item.CreateAt).format("YYYY-MM-DD HH:MM")}
+                                                        {moment(item.createAt).format("YYYY-MM-DD HH:mm:ss")}
                                                     </em>
                                                 </div>
                                                 <div dangerouslySetInnerHTML={{
