@@ -53,7 +53,7 @@ export default class Editor extends Component {
     setValue = (value) => this.editor.setValue(value);
     render () {
         return (
-            <div className="Editor">
+            <div style={{ lineHeight: 'normal'}} className="Editor">
                 <ul className="editor-tool-bar">
                     <li className="tool-item">
                         <a onClick={this.showModal}>

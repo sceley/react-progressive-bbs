@@ -49,7 +49,7 @@ export default class Container extends Component {
     render () {
         return (
             <div className="Container">
-                <Layout>
+                <Layout style={{minHeight: '100vh'}}>
                     <Header>
                         <div className="logo-wrapper">
                             <Link to="/">

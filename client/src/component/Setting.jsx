@@ -172,18 +172,3 @@ export default class Setting extends Component {
         );
     }
 };
-
-{/* <FormItem
-    label="邮箱"
->
-    {getFieldDecorator('email', {
-        rules: [{
-            type: 'email', message: '邮箱格式不正确!',
-        }, {
-            required: true, message: '请输入邮箱!'
-        }],
-        initialValue: this.state.user.email
-    })(
-        <Input prefix={<Icon type="mail" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="邮箱" />
-    )}
-</FormItem> */}

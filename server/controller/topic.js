@@ -1,5 +1,6 @@
 const moment = require('moment');
 const db = require('../model/db');
+const redis = require('../model/redis');
 const logger = require('../common/log').getLogger("app");
 exports.createTopic = async (req, res) => {
     try {
@@ -57,9 +58,19 @@ exports.getTopics = async (req, res) => {
                 }
             });
         });
+        let topics_count = await new Promise((resolve, reject) => {
+            let sql = 'select count(id) as count from Topic';
+            db.query(sql, (err, result) => {
+                if (err)
+                    reject(err);
+                else 
+                    resolve(result[0].count);
+            });
+        });
         res.json({
             err: 0,
-            topics
+            topics,
+            topics_count
         });
     } catch (e) {
         logger.error(`getTopics_handle->${e}`);
@@ -71,16 +82,35 @@ exports.getTopics = async (req, res) => {
 };
 exports.notRepTopics = async (req, res) => {
     try {
-        let topics = await new Promise((resolve, reject) => {
-            let sql = `select id, title from Topic where comments_count=? order by createAt desc limit ?`;
-            db.query(sql, [0, 5], (err, topics) => {
-                if (err) {
+        let topics;
+        topics = await new Promise((resolve, reject) => {
+            redis.get('notRepTopics', (err, topics) => {
+                if (err)
                     reject(err);
-                } else {
+                else
                     resolve(topics);
-                }
             });
         });
+        if (!topics) {
+            topics = await new Promise((resolve, reject) => {
+                let sql = `select id, title from Topic where comments_count=? order by createAt desc limit ?`;
+                db.query(sql, [0, 5], (err, topics) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(topics);
+                    }
+                });
+            });
+            await new Promise((resolve, reject) => {
+                redis.set('notRepTopics', JSON.stringify(topics), 'EX', 60 * 1, err => {
+                    if (err)
+                        reject(err);
+                    else
+                        resolve();
+                });
+            });
+        }
         res.json({
             err: 0,
             topics

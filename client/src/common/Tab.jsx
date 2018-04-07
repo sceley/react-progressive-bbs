@@ -5,7 +5,9 @@ import config from '../config';
 import moment from 'moment';
 export default class Tab extends Component {
     state = {
-        topics: []
+        topics: [],
+        topics_count: 0,
+        current: 1,
     }
     componentWillMount = () => {
         const tab = this.props.tab;
@@ -16,18 +18,41 @@ export default class Tab extends Component {
         }).then(json => {
             if (json && !json.err) {
                 this.setState({
-                    topics: json.topics
+                    topics: json.topics,
+                    topics_count: json.topics_count
+                });
+            }
+        });
+    }
+    scrollPage = (page) => {
+        const tab = this.props.tab;
+        fetch(`${config.server}/api/topics?tab=${tab}&page=${page}`)
+        .then(res => {
+            if (res.ok)
+                return res.json();
+        }).then(json => {
+            if (json && !json.err) {
+                this.setState({
+                    topics: json.topics,
+                    current: page
                 });
             }
         });
     }
     render () {
+        const pagination = {
+            pageSize: 10,
+            current: this.state.current,
+            total: this.state.topics_count,
+            onChange: this.scrollPage,
+        };
         return (
             <div className="Tab">
                 <List
                     itemLayout="horizontal"
                     dataSource={this.state.topics}
                     bordered={true}
+                    pagination={pagination}
                     renderItem={item => (
                         <List.Item actions={[<span>{moment(item.createAt).format("YYYY-MM-DD HH:mm:ss")}</span>]}>
                             <List.Item.Meta
