@@ -91,7 +91,9 @@ exports.notRepTopics = async (req, res) => {
                     resolve(topics);
             });
         });
-        if (!topics) {
+        if (topics) {
+            topics = JSON.parse(topics);
+        } else {
             topics = await new Promise((resolve, reject) => {
                 let sql = `select id, title from Topic where comments_count=? order by createAt desc limit ?`;
                 db.query(sql, [0, 5], (err, topics) => {
