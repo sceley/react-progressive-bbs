@@ -1,4 +1,4 @@
-# React-PWA-BBS
+# React-PWA-Bbs
 
 ## About
 
@@ -15,3 +15,4 @@
 - jsonwebtoken 做session状态
 - async/await、promise 做回调地狱的解决方案
 - log4js 做日志的记录
+- docker 做容器
