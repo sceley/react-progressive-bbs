@@ -18,7 +18,6 @@ exports.getCaptcha = async (req, res) => {
         if (email_count > 0) {
             return res.json({
                 err: 1,
-                field: 'email',
                 msg: '该邮箱已经被注册'
             });
         }
@@ -68,7 +67,6 @@ exports.getCaptchaFromUsername = async (req, res) => {
         if (!user) {
             return res.json({
                 err: 1,
-                field: 'username',
                 msg: '用户名不存在'
             });
         }
@@ -84,7 +82,6 @@ exports.getCaptchaFromUsername = async (req, res) => {
         });
         res.json({
             err: 0,
-            field: 'captcha',
             msg: '验证码已经发送'
         });
     } catch (e) {

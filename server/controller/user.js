@@ -17,10 +17,10 @@ exports.logup = async (req, res) => {
             });
         }
         let pattern = /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
-        if ((!body.username) || (body.username && (body.username.length > 10 || body.username.length < 2))) {
+        if ((!body.username) || (body.username && (body.username.length > 20 || body.username.length < 2))) {
             return res.json({
                 err: 1,
-                msg: '用户名必须为2-10位字符'
+                msg: '用户名必须为2-20位字符'
             });
         }
         if ((!body.password) || (body.password && (body.password.length > 16 || body.password.length < 6))) {
@@ -434,10 +434,10 @@ exports.userInfoEdit = async (req, res) => {
         let body = req.body;
         let id = req.session.uid;
         let updateAt = moment().format('YYYY-MM-DD HH:mm:ss');
-        if ((!body.username) || (body.username && (body.username.length > 10 || body.username.length < 2))) {
+        if ((!body.username) || (body.username && (body.username.length > 20 || body.username.length < 2))) {
             return res.json({
                 err: 1,
-                msg: '用户名必须为2-10位字符'
+                msg: '用户名必须为2-20位字符'
             });
         }
         let user = await new Promise((resolve, reject) => {
@@ -465,7 +465,6 @@ exports.userInfoEdit = async (req, res) => {
             if (names_count > 0) {
                 return res.json({
                     err: 1,
-                    field: 'username',
                     msg: '该用户名已经被使用'
                 });
             }
@@ -499,14 +498,12 @@ exports.forgotPassword = async (req, res) => {
         if (!(body.username && body.username.length >= 2 && body.username.length <= 20)) {
             return res.json({
                 err: 1,
-                field: 'username',
                 msg: '请输入用户名'
             });
         }
         if (!(body.captcha && body.captcha.length == 6 )) {
             return res.json({
                 err: 1,
-                field: 'captcha',
                 msg: '请输入6位验证码'
             });
         }
@@ -522,7 +519,6 @@ exports.forgotPassword = async (req, res) => {
         if (captcha != body.captcha) {
             return res.json({
                 err: 1,
-                field: 'captcha',
                 msg: '验证码不正确'
             });
         }
