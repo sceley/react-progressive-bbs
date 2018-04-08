@@ -1,11 +1,13 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import { Card, Form, Input, Button, Icon, Row, Col } from 'antd';
+import { Card, Form, Input, Button, Icon, Row, Col, message } from 'antd';
 import config from '../config';
 const FormItem = Form.Item;
 class LogupForm extends Component {
     state = {
-        confirmDirty: false
+        confirmDirty: false,
+        seconds: 60,
+        visible: true
     }
     handleSubmit = (e) => {
         e.preventDefault();
@@ -25,19 +27,18 @@ class LogupForm extends Component {
                     if (json && !json.err){
                         this.props.history.push('/');
                     } else if (json && json.err)  {
-                        if (json.field) {
-                            let error = {};
-                            error[json.field] = { errors: [new Error(json.msg)] }
-                            form.setFields(error);
-                        }
+                        message.error(json.msg);
                     }
                 });
             }
         });
     }
-    checkUsername = (rule, value, callback) => {
-        if (value && (value.length > 10 || value.length < 4)) {
-            callback("长度错误：用户名应为4-10个字符");
+    checkUsername = () => {
+        const form = this.props.form;
+        const username = form.getFieldValue('username');
+        if (!(username && username.length >= 2 && username.length <= 20)) {
+            form.setFields({ username: { errors: [new Error("请输入用户名")] } });
+            return;
         } else {
             fetch(`${config.server}/checkusername`, {
                 method: 'POST',
@@ -45,17 +46,11 @@ class LogupForm extends Component {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    username: value
+                    username: username
                 })
             }).then(res => {
                 if (res.ok) {
                     return res.json();
-                }
-            }).then(json => {
-                if (json && json.err) {
-                    callback(json.msg);
-                } else {
-                    callback();
                 }
             });
         }
@@ -83,36 +78,50 @@ class LogupForm extends Component {
         const value = e.target.value;
         this.setState({ confirmDirty: this.state.confirmDirty || !!value });
     }
-    getCaptcha = () => {
-        const form = this.props.form;
-        let username = form.getFieldValue('username');
-        if (!(username && username.length >= 2 && username.length <= 20)) {
-            form.setFields({ username: { errors: [new Error("请输入用户名")] } });
-            return;
-        }
-        fetch(`${config.server}/api/getcaptcha/from/username`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                username: username
-            })
-        }).then(res => {
-            if (res.ok)
-                return res.json();
-        }).then(json => {
-            if (json && !json.err) {
-                
-            } else if (json && json.err) {
-                if (json.field) {
-                    let error = {};
-                    error[json.field] = { errors: [new Error(json.msg)] }
-                    console.log(error);
-                    form.setFields(error);
-                }
+    handleTimer() {
+        let timer = setInterval(() => {
+            let seconds = this.state.seconds - 1;
+            if (seconds <= 0) {
+                clearInterval(timer);
+                this.setState({
+                    seconds: 60,
+                    visible: true
+                });
+            } else {
+                this.setState({
+                    seconds: seconds,
+                    visible: false
+                });
             }
-        });
+        }, 1000);
+    }
+    getCaptcha = async () => {
+        const form = this.props.form;
+        const res = await this.checkUsername();
+        const username = form.getFieldValue('username');
+        if (res && !res.err) {
+            fetch(`${config.server}/api/getcaptcha/from/username`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    username: username
+                })
+            }).then(res => {
+                if (res.ok)
+                    return res.json();
+            }).then(json => {
+                if (json && !json.err) {
+                    this.handleTimer();
+                    console.log(json.msg);
+                } else if (json && json.err) {
+                    message.error(json.msg);
+                }
+            });
+        } else if (res && res.err) {
+            message.error(res.msg);
+        }
     }
     render() {
         const { getFieldDecorator } = this.props.form;
@@ -121,14 +130,14 @@ class LogupForm extends Component {
                 <Card
                     title={<h2>忘记密码</h2>}
                 >
-                <Form style={{maxWidth: 500, margin: '0 auto'}} onSubmit={this.handleSubmit} className="login-form">
+                <Form style={{maxWidth: 500, margin: '0 auto'}} onSubmit={this.handleSubmit}>
                     <FormItem
                         label="用户名"
                     >
                         {getFieldDecorator('username', {
-                            rules: [{ required: true, message: '请输入确认密码!' }]
+                            rules: [{ required: true, message: '请输入用户名!' }]
                         })(
-                            <Input prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="2-10位字符的用户名" />
+                            <Input prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="2-20位字符的用户名" />
                         )}
                     </FormItem>
                     <FormItem
@@ -143,7 +152,12 @@ class LogupForm extends Component {
                                 )}
                             </Col>
                             <Col span={12}>
-                                <Button onClick={this.getCaptcha}>获取验证码</Button>
+                                {
+                                    this.state.visible ?
+                                        <Button onClick={this.getCaptcha}>获取验证码</Button>
+                                        :
+                                        <Button disabled onClick={this.getCaptcha}>{this.state.seconds}</Button>
+                                }
                             </Col>
                         </Row>
                     </FormItem>
@@ -152,7 +166,7 @@ class LogupForm extends Component {
                     >
                         {getFieldDecorator('password', {
                             rules: [{
-                                required: true, message: '请输入密码!'
+                                required: true, message: '请输入新密码!'
                             }, {
                                 validator: this.validateToNextPassword
                             }],

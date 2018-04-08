@@ -25,12 +25,10 @@ class LogupForm extends Component {
                     }
                 }).then(json => {
                     if (json && !json.err) {
-                        // message.info(json.msg); 
                         console.log(json.msg);
                         this.props.history.push('/login');
                     } else if (json && json.err) {
-                        // message.error(json.msg);
-                        console.log(json.msg);
+                        message.error(json.msg);
                     }
                 });
             }
@@ -58,7 +56,7 @@ class LogupForm extends Component {
                 if (json && !json.err) {
                     console.log(json.msg);
                 } else if (json && json.err) {
-                    form.setFields({ username: { errors: [new Error(json.msg)] } });
+                    message.error(json.msg);
                 }
             });
         }
@@ -144,14 +142,14 @@ class LogupForm extends Component {
                 }
             }).then(json => {
                 if (json && !json.err) {
+                    console.log(json.msg);
                     this.handleTimer();
                 } else if (json && json.err) {
-                    console.log(json.msg);
-                    // message.error(json.msg);
+                    message.error(json.msg);
                 }
             });
         } else if (res && res.err) {
-            form.setFields({ email: { errors: [new Error(res.msg)] } });
+            message.error(res.msg);
         }
     }
     checkCaptcha = () => {
@@ -183,7 +181,7 @@ class LogupForm extends Component {
                 if (json && !json.err) {
                     console.log(json.msg);
                 } else if (json && json.err) {
-                    form.setFields({ captcha: { errors: [new Error(json.msg)] } });
+                    message.error(json.msg);
                 }
             });
         }

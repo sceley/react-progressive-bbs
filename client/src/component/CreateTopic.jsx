@@ -29,7 +29,9 @@ class CreateTopicForm extends Component {
                 }).then(json => {
                     if (json && !json.err) {
                         this.props.history.push('/');
-                        message.info(json.msg);
+                        console.info(json.msg);
+                    } else if (json && json.err) {
+                        message.error(json.msg);
                     }
                 });
             }

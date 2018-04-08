@@ -42,7 +42,7 @@ class LoginForm extends Component {
                 <Card
                     title={<h2>登陆</h2>}
                 >
-                <Form style={{maxWidth: 500, margin: '0 auto'}} onSubmit={this.handleSubmit} className="login-form">
+                <Form style={{maxWidth: 500, margin: '0 auto'}} onSubmit={this.handleSubmit}>
                     <FormItem
                         label="账号"
                     >
@@ -69,7 +69,7 @@ class LoginForm extends Component {
                     </FormItem>
                     <FormItem>
                         <div>
-                                <Link to="/forgotpassword" className="login-form-forgot">忘记密码</Link>
+                            <Link to="/forgotpassword" className="login-form-forgot">忘记密码</Link>
                         </div>
                         <div style={{textAlign: 'center'}}>
                             <Button type="primary" htmlType="submit">
