@@ -6,6 +6,22 @@ const logger = require('../common/log').getLogger('app');
 exports.getCaptcha = async (req, res) => {
     try {
         let body = req.body;
+        let email_count = await new Promise((resolve, reject) => {
+            let sql = 'select count(id) as count from User where email=?';
+            db.query(sql, body.email, (err, result) => {
+                if (err)
+                    reject(err);
+                else
+                    resolve(result[0].count);
+            });
+        });
+        if (email_count > 0) {
+            return res.json({
+                err: 1,
+                field: 'email',
+                msg: '该邮箱已经被注册'
+            });
+        }
         let captcha = String(Math.random()).slice(-6);
         let pattern = /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
         if ((!body.email) || (body.email && !pattern.test(body.email))) {

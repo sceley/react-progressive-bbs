@@ -5,7 +5,9 @@ import config from '../config';
 const FormItem = Form.Item;
 class LogupForm extends Component {
     state = {
-        confirmDirty: false
+        confirmDirty: false,
+        visible: true,
+        seconds: 60
     }
     handleSubmit = (e) => {
         e.preventDefault();
@@ -23,10 +25,12 @@ class LogupForm extends Component {
                     }
                 }).then(json => {
                     if (json && !json.err) {
-                        message.info(json.msg);
+                        // message.info(json.msg); 
+                        console.log(json.msg);
                         this.props.history.push('/login');
-                    } else {
-                        message.error(json.msg);
+                    } else if (json && json.err) {
+                        // message.error(json.msg);
+                        console.log(json.msg);
                     }
                 });
             }
@@ -35,8 +39,8 @@ class LogupForm extends Component {
     checkUsername = () => {
         const form = this.props.form;
         const value = form.getFieldValue("username");
-        if (!(value && value.length <= 10 && value.length >= 2)) {
-            form.setFields({ username: { errors: [new Error("用户名应为2-10个字符")] } });
+        if (!(value && value.length <= 20 && value.length >= 2)) {
+            form.setFields({ username: { errors: [new Error("用户名应为2-20个字符")] } });
         } else {
             fetch(`${config.server}/api/checkusername`, {
                 method: 'POST',
@@ -51,7 +55,9 @@ class LogupForm extends Component {
                     return res.json();
                 }
             }).then(json => {
-                if (json && json.err) {
+                if (json && !json.err) {
+                    console.log(json.msg);
+                } else if (json && json.err) {
                     form.setFields({ username: { errors: [new Error(json.msg)] } });
                 }
             });
@@ -82,13 +88,13 @@ class LogupForm extends Component {
     }
     checkEmail = () => {
         const form = this.props.form;
-        let email = form.getFieldValue('email');
-        let pattern = /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
+        const email = form.getFieldValue('email');
+        const pattern = /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
         if (!(email && pattern.test(email))) {
             form.setFields({ email: { errors: [new Error("邮箱格式不正确")] } });
             return;
         }
-        fetch(`${config.server}/api/checkemail`, {
+        return fetch(`${config.server}/api/checkemail`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -99,38 +105,54 @@ class LogupForm extends Component {
         }).then(res => {
             if (res.ok) {
                 return res.json();
-            }
-        }).then(json => {
-            if (json && json.err) {
-                form.setFields({ email: { errors: [new Error(json.msg)] } });
             }
         });
     }
-    getCaptcha = () => {
+    handleTimer () {
+        let timer = setInterval(() => {
+            let seconds = this.state.seconds - 1;
+            if (seconds <= 0) {
+                clearInterval(timer);
+                this.setState({
+                    seconds: 60,
+                    visible: true
+                });
+            } else {
+                this.setState({
+                    seconds: seconds,
+                    visible: false
+                });
+            }
+        }, 1000);
+    }
+    getCaptcha = async () => {
         const form = this.props.form;
-        let email = form.getFieldValue('email');
-        let pattern = /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
-        if (!(email && pattern.test(email))) {
-            form.setFields({ email: { errors: [new Error("邮箱格式不正确")] } });
-            return;
+        const email = form.getFieldValue('email');
+        const res = await this.checkEmail();
+        if (res && !res.err) {
+            fetch(`${config.server}/api/getcaptcha`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    email
+                })
+            }).then(res => {
+                if (res.ok) {
+                    return res.json();
+                }
+            }).then(json => {
+                if (json && !json.err) {
+                    this.handleTimer();
+                } else if (json && json.err) {
+                    console.log(json.msg);
+                    // message.error(json.msg);
+                }
+            });
+        } else if (res && res.err) {
+            form.setFields({ email: { errors: [new Error(res.msg)] } });
         }
-        fetch(`${config.server}/api/getcaptcha`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                email
-            })
-        }).then(res => {
-            if (res.ok) {
-                return res.json();
-            }
-        }).then(json => {
-            if (json && json.err) {
-                message.error(json.msg);
-            }
-        });
     }
     checkCaptcha = () => {
         const form = this.props.form;
@@ -158,7 +180,9 @@ class LogupForm extends Component {
                     return res.json();
                 }
             }).then(json => {
-                if (json && json.err) {
+                if (json && !json.err) {
+                    console.log(json.msg);
+                } else if (json && json.err) {
                     form.setFields({ captcha: { errors: [new Error(json.msg)] } });
                 }
             });
@@ -171,7 +195,7 @@ class LogupForm extends Component {
                 <Card
                     title={<h2>注册</h2>}
                 >
-                <Form style={{ maxWidth: 500, margin: '0 auto'}} onSubmit={this.handleSubmit} className="login-form">
+                <Form style={{ maxWidth: 500, margin: '0 auto'}} onSubmit={this.handleSubmit}>
                     <FormItem
                         label="用户名"
                     >
@@ -193,7 +217,7 @@ class LogupForm extends Component {
                                 required: true, message: '请输入邮箱!'
                             }]
                         })(
-                            <Input prefix={<Icon type="mail" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="邮箱" onBlur={this.checkEmail} />
+                            <Input prefix={<Icon type="mail" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="邮箱"/>
                         )}
                     </FormItem>
                     <FormItem
@@ -203,7 +227,7 @@ class LogupForm extends Component {
                             rules: [{ 
                                 required: true, message: '请输入密码!' 
                             }, {
-                                    validator: this.validateToNextPassword
+                                validator: this.validateToNextPassword
                             }],
                         })(
                             <Input prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />} type="password" placeholder="6-16位字符的密码" />
@@ -236,7 +260,12 @@ class LogupForm extends Component {
                                 )}
                             </Col>
                             <Col span={12}>
-                                <Button onClick={this.getCaptcha}>获取验证码</Button>
+                                {
+                                    this.state.visible?
+                                    <Button onClick={this.getCaptcha}>获取验证码</Button>
+                                    :
+                                    <Button disabled onClick={this.getCaptcha}>{this.state.seconds}</Button>
+                                }
                             </Col>
                         </Row>
                     </FormItem>
