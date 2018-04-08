@@ -202,7 +202,7 @@ class LogupForm extends Component {
                                 required: true, message: '请输入用户名!' 
                             }]
                         })(
-                            <Input prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="2-10位字符的用户名" onBlur={this.checkUsername} />
+                            <Input prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="2-20位字符的用户名" onBlur={this.checkUsername} />
                         )}
                     </FormItem>
                     <FormItem

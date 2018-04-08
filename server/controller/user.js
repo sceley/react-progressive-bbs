@@ -241,8 +241,8 @@ exports.githubLogin = async (req, res) => {
             }
             await new Promise((resolve, reject) => {
                 let updateAt = moment().format("YYYY-MM-DD HH:mm:ss");
-                let sql = `update User set username=?, email=?, avatar=?, website=?, introduction=?, location=?, github=?, updateAt=?`; 
-                db.query(sql, [body.username, body._json.email, body._json.avatar_url, body._json.blog, body._json.bio, body._json.location, body.username, updateAt], err => {
+                let sql = `update User set username=?, email=?, avatar=?, website=?, introduction=?, location=?, github=?, updateAt=? where githubId=?`; 
+                db.query(sql, [body.username, body._json.email, body._json.avatar_url, body._json.blog, body._json.bio, body._json.location, body.username, updateAt, body.id], err => {
                     if (err) {
                         reject(err);
                     } else {
