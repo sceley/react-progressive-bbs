@@ -203,6 +203,53 @@ exports.githubLogin = async (req, res) => {
             });
         });
         if (user) {
+            if (body.username != user.username) {
+                let names_count = await new Promise((resolve, reject) => {
+                    let sql = 'select id from User where username=?';
+                    db.query(sql, [body.username], (err, users) => {
+                        if (err) {
+                            reject(err);
+                        } else {
+                            resolve(users.length);
+                        }
+                    });
+                });
+                if (names_count > 0) {
+                    return res.json({
+                        err: 1,
+                        msg: '该用户名已经被使用'
+                    });
+                }
+            }
+            if (body.email != user.email) {
+                let emails_count = await new Promise((resolve, reject) => {
+                    let sql = 'select id from User where email=?';
+                    db.query(sql, [body.email], (err, users) => {
+                        if (err) {
+                            reject(err);
+                        } else {
+                            resolve(users.length);
+                        }
+                    });
+                });
+                if (emails_count > 0) {
+                    return res.json({
+                        err: 1,
+                        msg: '该邮箱已经被注册'
+                    });
+                }
+            }
+            await new Promise((resolve, reject) => {
+                let updateAt = moment().format("YYYY-MM-DD HH:mm:ss");
+                let sql = `update set User username=?, email=?, avatar=?, website=?, introduction=?, location=?, github=?, updateAt=?`; 
+                db.query(sql, [body.username, body._json.email, body._json.avatar_url, body._json.blog, body._json.bio, body._json.location, body.username, updateAt], err => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve();
+                    }
+                });
+            });
             let token = await sign(user.id);
             res.redirect(`http://localhost:3001/login/callback?token=${token}`);
         } else {
