@@ -11,7 +11,6 @@ class LogupForm extends Component {
     }
     handleSubmit = (e) => {
         e.preventDefault();
-        const form = this.props.form;
         this.props.form.validateFieldsAndScroll((err, values) => {
             if (!err) {
                 fetch(`${config.server}/api/user/forgotpassword`, {
