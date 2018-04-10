@@ -18,7 +18,7 @@ exports.limitCreateTopic = async (req, res, next) => {
         if (!count) {
             count = 0;
         }
-        if (count >= config.topic.per_limit) {
+        if (count >= config.per_limit.topic) {
             return res.json({
                 err: 1,
                 msg: '你今日发帖的次数已经用完'
@@ -59,7 +59,7 @@ exports.limitPerComment = async (req, res, next) => {
         if (!count) {
             count = 0;
         }
-        if (count >= config.comment.per_limit) {
+        if (count >= config.per_limit.comment) {
             return res.json({
                 err: 1,
                 msg: '你今日评论的次数已经用完'
@@ -100,7 +100,7 @@ exports.limitPerGetCaptcha = async (req, res, next) => {
         if (!count) {
             count = 0;
         }
-        if (count >= config.captcha.per_limit) {
+        if (count >= config.per_limit.captcha) {
             return res.json({
                 err: 1,
                 msg: '你今日获取验证码的次数已经用完'

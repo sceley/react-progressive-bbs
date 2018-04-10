@@ -16,3 +16,19 @@
 - async/await、promise 做回调地狱的解决方案
 - log4js 做日志的记录
 - docker 做容器
+- github第三方接入 做github第三方登录
+- 七牛云接入 作为图片的存储空间
+- email接入 作为认证
+
+## 运行
+
+### 按需求修改配置文件(config.default.js、docker-compose.yml)
+
+- qn、github、email要自己去申请第三方服务接入
+- config.default.js中的数据库密码要跟docker-compose.yml配置的docker容器的密码要一样
+
+### 启动docker容器(容器中运行mysql、redis的服务)
+
+```shell
+docker-compose up -d
+```
