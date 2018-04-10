@@ -31,6 +31,10 @@ const searchUserOrTopic = require('./controller/search').searchUserOrTopic;
 
 const auth_user_login = require('./middleware/oauth').auth_user_login;
 const convert_to_user = require('./middleware/convert').convert_to_user;
+const limitCreateTopic = require('./middleware/limit').limitCreateTopic;
+const limitPerGetCaptcha = require('./middleware/limit').limitPerGetCaptcha;
+const limitOneGetCaptcha = require('./middleware/limit').limitOneGetCaptcha;
+const limitPerComment = require('./middleware/limit').limitPerComment;
 //api
 
 //github auth
@@ -62,12 +66,12 @@ router.post('/api/logup', logup);
 router.post('/api/upload/image', auth_user_login, multer().single('image'), uploadImage);
 router.post('/api/user/info/edit', auth_user_login, userInfoEdit);
 router.post('/api/user/forgotpassword', forgotPassword);
-router.post('/api/getcaptcha', getCaptcha);
-router.post('/api/getcaptcha/from/username', getCaptchaFromUsername);
+router.post('/api/getcaptcha', limitPerGetCaptcha, limitOneGetCaptcha, getCaptcha);
+router.post('/api/getcaptcha/from/username', limitPerGetCaptcha, limitOneGetCaptcha, getCaptchaFromUsername);
 router.post('/api/checkusername', checkUsername);
 router.post('/api/checkcaptcha', checkCaptcha);
 router.post('/api/checkemail', checkEmail);
-router.post('/api/topic/create', auth_user_login, createTopic);
-router.post('/api/topic/:id/comment', auth_user_login, comment);
+router.post('/api/topic/create', auth_user_login, limitCreateTopic, createTopic);
+router.post('/api/topic/:id/comment', auth_user_login, limitPerComment, comment);
 
 module.exports = router;

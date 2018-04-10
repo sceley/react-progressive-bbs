@@ -4,6 +4,7 @@ const db = require('../model/db');
 const redis = require('../model/redis');
 const logger = require('../common/log').getLogger("app");
 const sign = require('../common/sign').sign;
+const config = require('../config');
 const saltRounds = 10;
 
 exports.logup = async (req, res) => {
@@ -251,7 +252,7 @@ exports.githubLogin = async (req, res) => {
                 });
             });
             let token = await sign(user.id);
-            res.redirect(`http://localhost:3001/login/callback?token=${token}`);
+            res.redirect(`${config.github_client}?token=${token}`);
         } else {
             let names_count = await new Promise((resolve, reject) => {
                 let sql = 'select id from User where username=?';
@@ -308,7 +309,7 @@ exports.githubLogin = async (req, res) => {
                 });
             });
             let token = await sign(_user.id);
-            res.redirect(`http://localhost:3001/login/callback?token=${token}`);
+            res.redirect(`${config}?token=${token}`);
         }
     } catch (e) {
         logger.error(`githubLogin_handle->${e}`);

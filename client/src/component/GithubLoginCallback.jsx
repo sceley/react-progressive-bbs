@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-export default class LoginCallback extends Component {
+export default class GithubLoginCallback extends Component {
     componentWillMount = () => {
         let token = this.props.location.search.slice(1).split('=')[1];
         localStorage.token = token;
@@ -7,7 +7,7 @@ export default class LoginCallback extends Component {
     }
     render() {
         return (
-            <div className="LoginCallback">
+            <div className="GithubLoginCallback">
             </div>
         );
     }

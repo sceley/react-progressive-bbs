@@ -7,7 +7,7 @@ import Logup from './Logup';
 import CreateTopic from './CreateTopic';
 import ForgotPass from './ForgotPass';
 import Topic from './Topic';
-import LoginCallback from './LoginCallback';
+import GithubLoginCallback from './GithubLoginCallback';
 import Setting from './Setting';
 import User from './User';
 import config from '../config';
@@ -96,7 +96,7 @@ export default class Container extends Component {
                         <Switch>
                             <Route exact path={`${this.props.match.url}`} component={Home} />
                             <Route exact path={`${this.props.match.url}login`} component={Login} />
-                            <Route path={`${this.props.match.url}login/callback`} component={LoginCallback}/>
+                            <Route path={`${this.props.match.url}github/login/callback`} component={GithubLoginCallback}/>
                             <Route path={`${this.props.match.url}logup`} component={Logup} />
                             <Route path={`${this.props.match.url}forgotpassword`} component={ForgotPass} />
                             <Route path={`${this.props.match.url}topic/create`} component={CreateTopic} />
