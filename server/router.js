@@ -6,7 +6,7 @@ const passport = require('passport');
 
 const router = Router();
 const login = require('./controller/user').login;
-const githubLogin = require('./controller/user').githubLogin;
+const authGithub = require('./controller/user').authGithub;
 const logup = require('./controller/user').logup;
 const userInfo = require('./controller/user').userInfo;
 const userInfoById = require('./controller/user').userInfoById;
@@ -18,6 +18,7 @@ const getCaptchaFromUsername = require('./controller/captcha').getCaptchaFromUse
 const checkUsername = require('./controller/checkout').checkUsername;
 const checkCaptcha = require('./controller/checkout').checkCaptcha;
 const checkEmail = require('./controller/checkout').checkEmail;
+const checkCaptchaFromUsername = require();
 const createTopic = require('./controller/topic').createTopic;
 const getTopics = require('./controller/topic').getTopics;
 const getTopic = require('./controller/topic').getTopic;
@@ -40,7 +41,7 @@ const limitPerComment = require('./middleware/limit').limitPerComment;
 //github auth
 router.get('/api/auth/github', passport.authenticate('github'));
 
-router.get('/api/auth/github/callback', passport.authenticate('github'), githubLogin);
+router.get('/api/auth/github/callback/', passport.authenticate('github'), authGithub);
 
 
 //get
@@ -68,6 +69,7 @@ router.post('/api/user/info/edit', auth_user_login, userInfoEdit);
 router.post('/api/user/forgotpassword', forgotPassword);
 router.post('/api/getcaptcha', limitPerGetCaptcha, limitOneGetCaptcha, getCaptcha);
 router.post('/api/getcaptcha/from/username', limitPerGetCaptcha, limitOneGetCaptcha, getCaptchaFromUsername);
+router.post('/api/checkcaptcha/from/username', checkCaptchaFromUsername);
 router.post('/api/checkusername', checkUsername);
 router.post('/api/checkcaptcha', checkCaptcha);
 router.post('/api/checkemail', checkEmail);

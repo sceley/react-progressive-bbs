@@ -86,8 +86,9 @@ exports.limitPerComment = async (req, res, next) => {
 };
 exports.limitPerGetCaptcha = async (req, res, next) => {
     try {
-        const ip = req.socket.remoteAddress;
+        const ip = req.connection.remoteAddress;
         const key = ip;
+        console.log(ip);
         let count = await new Promise((resolve, reject) => {
             redis.get(key, (err, count) => {
                 if (err) {

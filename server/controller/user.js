@@ -190,7 +190,7 @@ exports.login = async (req, res) => {
         });
     }
 };
-exports.githubLogin = async (req, res) => {
+exports.authGithub = async (req, res) => {
     try {
         let body = req.user;
         let user = await new Promise((resolve, reject) => {
@@ -252,7 +252,7 @@ exports.githubLogin = async (req, res) => {
                 });
             });
             let token = await sign(user.id);
-            res.redirect(`${config.github_client}?token=${token}`);
+            res.redirect(`${config.github_client.callbackURL}?token=${token}`);
         } else {
             let names_count = await new Promise((resolve, reject) => {
                 let sql = 'select id from User where username=?';

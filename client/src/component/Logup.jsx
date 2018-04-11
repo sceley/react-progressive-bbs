@@ -149,7 +149,7 @@ class LogupForm extends Component {
                 }
             });
         } else if (res && res.err) {
-            message.error(res.msg);
+            form.setFields({ email: { errors: [new Error(res.msg)] } });
         }
     }
     checkCaptcha = () => {

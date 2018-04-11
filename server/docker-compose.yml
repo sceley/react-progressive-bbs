@@ -5,12 +5,19 @@ services:
     ports:
       - '3306:3306'
     volumes:
-      - '$PWD/mysql:/etc/mysql'
+      - '$PWD/conf/mysql:/etc/mysql'
     environment: 
       - MYSQL_ROOT_PASSWORD=16051223
-    container_name: mysql_club
+    container_name: mysql_bbs
   redis:
     image: redis
     ports: 
       - '6379:6379'
-    container_name: redis_club
+    container_name: redis_bbs
+  nginx:
+    image: nginx
+    ports:
+      - '80:80'
+    volumes: 
+      - '$PWD/conf/nginx:/etc/nginx'
+    container_name: nginx_bbs

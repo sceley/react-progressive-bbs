@@ -22,10 +22,10 @@
 
 ## 运行
 
-### 按需求修改配置文件(config.default.js、docker-compose.yml)
+### 按需求修改配置文件config.default.js
 
 - qn、github、email要自己去申请第三方服务接入
-- config.default.js中的数据库密码要跟docker-compose.yml配置的docker容器的密码要一样
+- mysql、redis密码根据自己
 
 ### 启动docker容器(容器中运行mysql、redis的服务)
 

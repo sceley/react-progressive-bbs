@@ -24,35 +24,13 @@ class LogupForm extends Component {
                         return res.json();
                 }).then(json => {
                     if (json && !json.err){
-                        this.props.history.push('/');
+                        this.props.history.push('/login');
                     } else if (json && json.err)  {
                         message.error(json.msg);
                     }
                 });
             }
         });
-    }
-    checkUsername = () => {
-        const form = this.props.form;
-        const username = form.getFieldValue('username');
-        if (!(username && username.length >= 2 && username.length <= 20)) {
-            form.setFields({ username: { errors: [new Error("请输入用户名")] } });
-            return;
-        } else {
-            fetch(`${config.server}/checkusername`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    username: username
-                })
-            }).then(res => {
-                if (res.ok) {
-                    return res.json();
-                }
-            });
-        }
     }
     validateToNextPassword = (rule, value, callback) => {
         const form = this.props.form;
@@ -94,11 +72,28 @@ class LogupForm extends Component {
             }
         }, 1000);
     }
-    getCaptcha = async () => {
+    checkUsername = async (req, res) => {
         const form = this.props.form;
-        const res = await this.checkUsername();
         const username = form.getFieldValue('username');
-        if (res && !res.err) {
+        return fetch(`${config.server}/api/checkusername`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                username: username
+            })
+        }).then(res => {
+            if (res.ok)
+                return res.json();
+        });
+    }
+    getCaptcha = async () => {
+        const res = await this.checkUsername();
+        console.log(res);
+        const form = this.props.form;
+        const username = form.getFieldValue('username');
+        if (res && res.err) {
             fetch(`${config.server}/api/getcaptcha/from/username`, {
                 method: 'POST',
                 headers: {
@@ -113,14 +108,38 @@ class LogupForm extends Component {
             }).then(json => {
                 if (json && !json.err) {
                     this.handleTimer();
-                    console.log(json.msg);
                 } else if (json && json.err) {
                     message.error(json.msg);
                 }
             });
-        } else if (res && res.err) {
-            message.error(res.msg);
+        } else if (res && !res.err) {
+            form.setFields({ username: { errors: [new Error("该用户不存在")] } });
         }
+    }
+    checkCaptcha = async (req, res) => {
+        const form = this.props.form;
+        const captcha = form.getFieldValue("captcha");
+        const username = form.getFieldValue('username');
+        fetch(`${config.server}/api/checkcaptcha/from/username`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                username: username,
+                captcha: captcha
+            })
+        }).then(res => {
+            if (res.ok) {
+                return res.json();
+            }
+        }).then(json => {
+            if (json && !json.err) {
+                console.log(json.msg);
+            } else if (json && json.err) {
+                form.setFields({ captcha: { errors: [new Error(json.msg)] } });
+            }
+        });
     }
     render() {
         const { getFieldDecorator } = this.props.form;
@@ -147,7 +166,7 @@ class LogupForm extends Component {
                                 {getFieldDecorator('captcha', {
                                     rules: [{ required: true, message: '请输入验证码!' }]
                                 })(
-                                    <Input prefix={<Icon type="code-o" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="6位字符的验证码" />
+                                        <Input prefix={<Icon type="code-o" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="6位字符的验证码" onBlur={this.checkCaptcha} />
                                 )}
                             </Col>
                             <Col span={12}>
