@@ -21,7 +21,7 @@ class LoginForm extends Component {
                    if (json && !json.err) {
                         localStorage.token = json.token;
                         this.props.history.push('/');
-                   } else {
+                   } else if (json && json.err) {
                        message.error(json.msg);
                    }
                });

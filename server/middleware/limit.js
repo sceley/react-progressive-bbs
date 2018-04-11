@@ -86,7 +86,7 @@ exports.limitPerComment = async (req, res, next) => {
 };
 exports.limitPerGetCaptcha = async (req, res, next) => {
     try {
-        const ip = req.connection.remoteAddress;
+        const ip = req.socket.remoteAddress;
         const key = ip;
         console.log(ip);
         let count = await new Promise((resolve, reject) => {

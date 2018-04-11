@@ -108,8 +108,9 @@ class LogupForm extends Component {
             }).then(json => {
                 if (json && !json.err) {
                     this.handleTimer();
+                    console.log(json.msg);
                 } else if (json && json.err) {
-                    message.error(json.msg);
+                    form.setFields({ username: { errors: [new Error(json.msg)] } });
                 }
             });
         } else if (res && !res.err) {

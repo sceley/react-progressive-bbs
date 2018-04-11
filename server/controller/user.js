@@ -160,6 +160,12 @@ exports.login = async (req, res) => {
                 msg: '该户名不存在'
             });
         }
+        if (!user.password) {
+            return res.json({
+                err: 1,
+                msg: '请通过github登录'
+            });
+        }
         let corrected = await new Promise((resolve, reject) => {
             bcrypt.compare(body.password, user.password, function (err, corrected) {
                 if (err) {
@@ -309,7 +315,7 @@ exports.authGithub = async (req, res) => {
                 });
             });
             let token = await sign(_user.id);
-            res.redirect(`${config}?token=${token}`);
+            res.redirect(`${config.github_client.callbackURL}?token=${token}`);
         }
     } catch (e) {
         logger.error(`githubLogin_handle->${e}`);

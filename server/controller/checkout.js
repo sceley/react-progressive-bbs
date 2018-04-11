@@ -65,6 +65,37 @@ exports.checkCaptcha = async (req, res) => {
         });
     }
 };
+exports.checkCaptchaFromUsername = async (req, res) => {
+    try {
+        let body = req.body;
+        let captcha = await new Promise((resolve, reject) => {
+            redis.get(body.username, (err, captcha) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(captcha);
+                }
+            });
+        });
+        if (body.captcha === captcha) {
+            res.json({
+                err: 0,
+                msg: '验证码正确'
+            });
+        } else {
+            res.json({
+                err: 1,
+                msg: '验证码不正确'
+            });
+        }
+    } catch (e) {
+        logger.error(`checkCaptcha_handle->${e}`);
+        res.json({
+            err: 1,
+            msg: '服务器出错了'
+        });
+    }
+};
 
 exports.checkEmail = async (req, res) => {
     try {

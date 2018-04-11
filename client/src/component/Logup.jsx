@@ -56,7 +56,7 @@ class LogupForm extends Component {
                 if (json && !json.err) {
                     console.log(json.msg);
                 } else if (json && json.err) {
-                    message.error(json.msg);
+                    form.setFields({ username: { errors: [new Error(json.msg)] } });
                 }
             });
         }
@@ -145,7 +145,7 @@ class LogupForm extends Component {
                     console.log(json.msg);
                     this.handleTimer();
                 } else if (json && json.err) {
-                    message.error(json.msg);
+                    form.setFields({ captcha: { errors: [new Error(json.msg)] } });
                 }
             });
         } else if (res && res.err) {
@@ -181,7 +181,7 @@ class LogupForm extends Component {
                 if (json && !json.err) {
                     console.log(json.msg);
                 } else if (json && json.err) {
-                    message.error(json.msg);
+                    form.setFields({ captcha: { errors: [new Error(json.msg)] } });
                 }
             });
         }
