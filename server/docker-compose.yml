@@ -14,10 +14,10 @@ services:
     ports: 
       - '6379:6379'
     container_name: redis_bbs
-  nginx:
-    image: nginx
-    ports:
-      - '80:80'
-    volumes: 
-      - '$PWD/conf/nginx:/etc/nginx'
-    container_name: nginx_bbs
+  # nginx:
+  #   image: nginx
+  #   ports:
+  #     - '80:80'
+  #   volumes: 
+  #     - '$PWD/conf/nginx:/etc/nginx'
+  #   container_name: nginx_bbs
