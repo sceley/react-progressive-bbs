@@ -2,8 +2,10 @@ version: '2'
 services:
   mysql:
     image: mysql
-    ports:
-      - '3306:3306'
+    expose:
+      - '3306'
+    # ports:
+    #   - '3306:3306'
     volumes:
       - '$PWD/conf/mysql:/etc/mysql'
     environment: 
@@ -11,13 +13,28 @@ services:
     container_name: mysql_bbs
   redis:
     image: redis
-    ports: 
-      - '6379:6379'
+    expose:
+      - '6379'
+    # ports: 
+    #   - '6379:6379'
     container_name: redis_bbs
-  # nginx:
-  #   image: nginx
-  #   ports:
-  #     - '80:80'
-  #   volumes: 
-  #     - '$PWD/conf/nginx:/etc/nginx'
-  #   container_name: nginx_bbs
+    command: redis-server --appendonly yes
+  node:
+    image: node:8.11.1
+    volumes: 
+      - '$PWD:/home/bbs'
+    links:
+      - mysql:localhost
+      - redis:localhost
+    ports: 
+      - '8080:8080'
+    container_name: node_bbs
+    command: bash -c "cd /home/bbs && npm install && node app.js"
+  nginx:
+    image: nginx
+    ports:
+      - '80:80'
+    volumes: 
+      - '../client/build:/usr/share/nginx/html'
+      - '$PWD/conf/nginx:/etc/nginx'
+    container_name: nginx_bbs
