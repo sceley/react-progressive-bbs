@@ -1,4 +1,4 @@
-# React-PWA-Bbs
+# react-progressive-bbs
 
 ## About
 
