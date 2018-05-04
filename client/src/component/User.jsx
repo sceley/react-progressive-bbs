@@ -41,7 +41,7 @@ export default class User extends Component {
                                 dataSource={this.state.topics}
                                 bordered={true}
                                 renderItem={item => (
-                                    <List.Item actions={[<span>{moment(item.CreateAt).format("YYYY-MM-DD hh:mm:ss")}</span>]}>
+                                    <List.Item actions={[<span>{moment(item.CreateAt).format("YYYY-MM-DD HH:mm:ss")}</span>]}>
                                         <List.Item.Meta
                                             avatar={
                                                 <Link to={`/user/${item.uid}`}>
