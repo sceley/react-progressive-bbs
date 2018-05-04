@@ -254,10 +254,21 @@ export default class Topic extends Component {
                                 bordered={true}
                                 renderItem={item => (
                                     <List.Item
-                                        actions={[
-                                            <a onClick={() => this.handleEnter(item.author)}><Icon type="enter" /></a>,
-                                            <a onClick={() => this.handleDeleteComment(item.id)}><Icon type="delete" /></a>
-                                        ]}
+                                        actions={
+                                                this.state.me_id ?
+                                                [
+                                                    <a href="#editor" onClick={() => this.handleEnter(item.author)}>
+                                                        <Icon type="enter" />
+                                                    </a>,
+                                                    this.state.me_id === this.state.user.id ?
+                                                    <a onClick={() => this.handleDeleteComment(item.id)}>
+                                                        <Icon type="delete" />
+                                                    </a>
+                                                    :null
+                                                ]
+                                                :
+                                                []
+                                        }
                                     >
                                         <div className="list-item-meta">
                                             <Link to={`/user/${item.uid}`}>
@@ -284,7 +295,7 @@ export default class Topic extends Component {
                             />
                         </Card>
                         <div style={{ marginTop: 24 }}>
-                            <Editor ref="editor" />
+                            <Editor id="editor" ref="editor" />
                             <div style={{ marginTop: 24, textAlign: 'center' }}>
                                 <Button onClick={this.handleSubmit} type="primary">回复</Button>
                             </div>
