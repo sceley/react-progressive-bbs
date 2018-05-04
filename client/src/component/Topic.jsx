@@ -260,7 +260,7 @@ export default class Topic extends Component {
                                                     <a href="#editor" onClick={() => this.handleEnter(item.author)}>
                                                         <Icon type="enter" />
                                                     </a>,
-                                                    this.state.me_id === this.state.user.id ?
+                                                    item.id === this.state.me_id ?
                                                     <a onClick={() => this.handleDeleteComment(item.id)}>
                                                         <Icon type="delete" />
                                                     </a>
@@ -295,7 +295,9 @@ export default class Topic extends Component {
                             />
                         </Card>
                         <div style={{ marginTop: 24 }}>
-                            <Editor id="editor" ref="editor" />
+                            <div id="editor">
+                                <Editor ref="editor" />
+                            </div>
                             <div style={{ marginTop: 24, textAlign: 'center' }}>
                                 <Button onClick={this.handleSubmit} type="primary">回复</Button>
                             </div>
