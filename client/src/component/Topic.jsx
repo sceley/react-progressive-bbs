@@ -151,8 +151,11 @@ export default class Topic extends Component {
                 return res.json();
         }).then(json => {
             if (json && !json.err) {
+                let topic = this.state.topic;
+                topic.comments_count++;
                 this.setState({
-                    comments: [...this.state.comments, json.comment]
+                    comments: [...this.state.comments, json.comment],
+                    topic: topic
                 });
                 this.refs.editor.setValue('');
             } else {
