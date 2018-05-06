@@ -215,8 +215,11 @@ export default class Topic extends Component {
                 comments = comments.filter(comment => {
                     return comment.id !== cid;
                 });
+                let topic = this.state.topic;
+                topic.comments_count--;
                 this.setState({
-                    comments: comments
+                    comments: comments,
+                    topic: topic
                 });
                 message.info(json.msg);
             } else {

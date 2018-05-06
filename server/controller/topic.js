@@ -222,7 +222,8 @@ exports.comment = async (req, res) => {
             });
         });
         let comment = await new Promise((resolve, reject) => {
-            let sql = `select Comment.id, User.username as author, avatar, body, Comment.createAt 
+            let sql = `select Comment.id, User.username as author, 
+            avatar, body, Comment.createAt, User.id as uid
             from Comment left join User on User.id=Comment.author_id
             where Comment.createAt=?`;
             db.query(sql, [createAt], (err, comments) => {
