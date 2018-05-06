@@ -4,9 +4,9 @@ const redis = require('../model/redis');
 const logger = require('../common/log').getLogger("app");
 exports.createTopic = async (req, res) => {
     try {
-        let body = req.body;
-        let createAt = moment().format("YYYY-MM-DD HH:mm:ss");
-        let uid = req.session.uid;
+        const body = req.body;
+        const createAt = moment().format("YYYY-MM-DD HH:mm:ss");
+        const uid = req.session.uid;
         if (!(body instanceof Object)) {
             return res.json({
                 err: 1,
@@ -14,7 +14,7 @@ exports.createTopic = async (req, res) => {
             });
         }
         await new Promise((resolve, reject) => {
-            let sql = "insert into Topic(tab, title, body, author_id, createAt) values(?, ?, ?, ?, ?)";
+            const sql = "insert into Topic(tab, title, body, author_id, createAt) values(?, ?, ?, ?, ?)";
             db.query(sql, [body.tab, body.title, body.body, uid, createAt], (err) => {
                 if (err) {
                     reject(err);
@@ -412,9 +412,19 @@ exports.deleteComment = async (req, res) => {
                 }
             });
         });
+        const comments_count = await new Promise((resolve, reject) => {
+            const sql = 'select comments_count from Topic where id=?';
+            db.query(sql, [cid], (err, topics) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(topics[0].comments_count);
+                }
+            });
+        });
         await new Promise((resolve, reject) => {
-            let sql = `update Topic set comments_count=comments_count-1 where id=?`;
-            db.query(sql, [cid], (err) => {
+            let sql = `update Topic set comments_count=? where id=?`;
+            db.query(sql, [comments_count, cid], (err) => {
                 if (err) {
                     reject(err);
                 } else {

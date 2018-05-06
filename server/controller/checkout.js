@@ -3,18 +3,24 @@ const redis = require('../model/redis');
 const logger = require('../common/log').getLogger('app');
 exports.checkUsername = async (req, res) => {
     try {
-        let body = req.body;
-        let users = await new Promise((resolve, reject) => {
-            let sql = 'select id from User where username=?';
+        const body = req.body;
+        if (!body.username) {
+            return res.json({
+                err: 1,
+                msg: '用户名不能为空'
+            });
+        }
+        const count = await new Promise((resolve, reject) => {
+            const sql = 'select count(*) as count from User where username=?';
             db.query(sql, [body.username], (err, users) => {
                 if (err) {
                     reject(err);
                 } else {
-                    resolve(users);
+                    resolve(users[0].count);
                 }
             });
         });
-        if (users.length > 0) {
+        if (count > 0) {
             res.json({
                 err: 1,
                 msg: '用户名已经被使用'
@@ -36,8 +42,20 @@ exports.checkUsername = async (req, res) => {
 
 exports.checkCaptcha = async (req, res) => {
     try {
-        let body = req.body;
-        let captcha = await new Promise((resolve, reject) => {
+        const body = req.body;
+        if (!body.email) {
+            return res.json({
+                err: 1,
+                msg: '邮箱不能为空'
+            });
+        }
+        if (!body.captcha) {
+            return res.json({
+                err: 1,
+                msg: '验证码不能为空'
+            });
+        }
+        const captcha = await new Promise((resolve, reject) => {
             redis.get(body.email, (err, captcha) => {
                 if (err) {
                     reject(err);
@@ -67,8 +85,20 @@ exports.checkCaptcha = async (req, res) => {
 };
 exports.checkCaptchaFromUsername = async (req, res) => {
     try {
-        let body = req.body;
-        let captcha = await new Promise((resolve, reject) => {
+        const body = req.body;
+        if (!body.username) {
+            return res.json({
+                err: 1,
+                msg: '用户名不能为空'
+            });
+        }
+        if (!body.captcha) {
+            return res.json({
+                err: 1,
+                msg: '验证码不能为空'
+            });
+        }
+        const captcha = await new Promise((resolve, reject) => {
             redis.get(body.username, (err, captcha) => {
                 if (err) {
                     reject(err);
@@ -99,18 +129,24 @@ exports.checkCaptchaFromUsername = async (req, res) => {
 
 exports.checkEmail = async (req, res) => {
     try {
-        let body = req.body;
-        let users = await new Promise((resolve, reject) => {
-            let sql = 'select * from User where email=?';
+        const body = req.body;
+        if (!body.email) {
+            return res.json({
+                err: 1,
+                msg: '邮箱不能为空'
+            });
+        }
+        const count = await new Promise((resolve, reject) => {
+            const sql = 'select count(*) as count from User where email=?';
             db.query(sql, [body.email], (err, users) => {
                 if (err) {
                     reject(err);
                 } else {
-                    resolve(users);
+                    resolve(users[0].count);
                 }
             });
         });
-        if (users.length > 0) {
+        if (count > 0) {
             res.json({
                 err: 1,
                 msg: 'Email已经被注册'
