@@ -403,8 +403,8 @@ exports.deleteComment = async (req, res) => {
             });
         }
         await new Promise((resolve, reject) => {
-            let sql = "delete from Comment where id=? and tid=? and author_id=?";
-            db.query(sql, [cid, tid, uid], (err) => {
+            let sql = "delete from Comment where id=?";
+            db.query(sql, [comment.id], (err) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -412,19 +412,9 @@ exports.deleteComment = async (req, res) => {
                 }
             });
         });
-        const comments_count = await new Promise((resolve, reject) => {
-            const sql = 'select comments_count from Topic where id=?';
-            db.query(sql, [cid], (err, topics) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(topics[0].comments_count);
-                }
-            });
-        });
         await new Promise((resolve, reject) => {
-            let sql = `update Topic set comments_count=? where id=?`;
-            db.query(sql, [comments_count, cid], (err) => {
+            let sql = `update Topic set comments_count=comments_count - 1 where id=?`;
+            db.query(sql, [tid], (err) => {
                 if (err) {
                     reject(err);
                 } else {
