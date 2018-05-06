@@ -260,7 +260,7 @@ export default class Topic extends Component {
                                                     <a href="#editor" onClick={() => this.handleEnter(item.author)}>
                                                         <Icon type="enter" />
                                                     </a>,
-                                                    item.id === this.state.me_id ?
+                                                    item.uid === this.state.me_id ?
                                                     <a onClick={() => this.handleDeleteComment(item.id)}>
                                                         <Icon type="delete" />
                                                     </a>
